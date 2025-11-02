@@ -1,458 +1,204 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- We'll use Tailwind CSS for a fast, professional layout -->
+  <script src="https://cdn.tailwindcss.com"></script>
   <title>Lunarith | Where stories dream beneath the moon.</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Marcellus&family=Poppins:wght@300;400;500;700&display=swap');
-
-    /* --- Base Setup --- */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    /* We'll keep your custom fonts */
+    @import url('https://fonts.googleapis.com/css2?family=Marcellus&family=Poppins:wght@300;500;700&display=swap');
 
     body {
-      font-family: 'Poppins', sans-serif;
+      /* This is your beautiful dark gradient */
       background: radial-gradient(circle at top, #0c0c1d, #030308);
-      color: #eaeaea;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      overflow-x: hidden;
+      font-family: 'Poppins', sans-serif;
     }
 
-    /* --- Header & Moon --- */
-    header {
-      padding: 2rem 1rem 1rem;
-      text-align: center;
-      position: relative;
-      width: 100%;
-      z-index: 10;
-    }
-
-    .moon {
-      position: absolute;
-      top: 1rem;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 80px; /* Adjusted for a cleaner header */
-      height: 80px;
-      background: radial-gradient(circle, #fff, #cfcfff, #9f9fff22);
-      border-radius: 50%;
-      box-shadow: 0 0 40px #bbaaff;
-      animation: pulse 6s infinite alternate;
-      z-index: -1;
-    }
-
-    @keyframes pulse {
-      from {
-        opacity: 0.8;
-        transform: translateX(-50%) scale(1);
-      }
-      to {
-        opacity: 1;
-        transform: translateX(-50%) scale(1.05);
-      }
-    }
-
-    h1.site-title {
+    /* We'll use Marcellus for titles */
+    .font-marcellus {
       font-family: 'Marcellus', serif;
-      font-size: 3rem;
-      margin-top: 5rem;
-      letter-spacing: 2px;
-      color: #f7f5ff;
-      text-shadow: 0 0 10px #cbbcff;
-      cursor: pointer; /* Added cursor */
-    }
-
-    p.tagline {
-      font-size: 1.1rem;
-      color: #bfbff5;
-      margin-top: 0.5rem;
-      font-style: italic;
-    }
-
-    /* --- Navigation --- */
-    nav {
-      width: 100%;
-      padding: 1.5rem 0;
-      display: flex;
-      justify-content: center;
-      gap: 1.5rem;
-      border-bottom: 1px solid #2a2a4a;
-    }
-
-    nav a {
-      font-family: 'Marcellus', serif;
-      color: #bfbff5;
-      text-decoration: none;
-      font-size: 1.3rem;
-      padding: 0.5rem 1rem;
-      border-radius: 20px;
-      transition: all 0.3s ease;
-    }
-
-    nav a:hover,
-    nav a.active {
-      color: #ffffff;
-      background: #7a63f3;
-      text-shadow: 0 0 10px #fff;
-    }
-
-    /* --- Main Content & Pages --- */
-    main {
-      flex-grow: 1;
-      width: 100%;
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 2rem 1rem;
-    }
-
-    /* Page sections */
-    .page {
-      display: none; /* Hidden by default */
-      animation: fadeIn 0.5s ease;
-    }
-
-    .page.active {
-      display: block; /* Shown by JS */
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* --- Page-Specific Styles --- */
-
-    /* Home Page */
-    #home {
-      text-align: center;
-    }
-
-    .featured-novel {
-      background: rgba(12, 12, 29, 0.6);
-      border: 1px solid #2a2a4a;
-      padding: 2.5rem;
-      border-radius: 15px;
-      margin-top: 1rem;
-    }
-
-    h2 {
-      font-family: 'Marcellus', serif;
-      font-size: 2.5rem;
-      color: #c4b4ff;
-      margin-bottom: 1rem;
-    }
-
-    p.description {
-      color: #b3b3b3;
-      max-width: 600px;
-      margin: 0 auto 2rem;
-      line-height: 1.7;
-      font-size: 1.1rem;
-    }
-
-    a.btn {
-      display: inline-block;
-      padding: 0.8rem 1.6rem;
-      background: #7a63f3;
-      color: #fff;
-      border-radius: 30px;
-      text-decoration: none;
-      font-weight: 600;
-      transition: all 0.3s ease;
-      font-size: 1.1rem;
-      margin-top: 1rem;
-    }
-
-    a.btn:hover {
-      background: #9c83ff;
-      box-shadow: 0 0 20px #9c83ff;
-    }
-
-    /* Chapters Page */
-    .volume-list {
-      margin-top: 1rem;
-    }
-
-    .volume {
-      background: rgba(12, 12, 29, 0.6);
-      border: 1px solid #2a2a4a;
-      border-radius: 15px;
-      padding: 1.5rem 2rem;
-      margin-bottom: 2rem;
-    }
-
-    .volume h3 {
-      font-family: 'Marcellus', serif;
-      font-size: 2rem;
-      color: #c4b4ff;
-      border-bottom: 1px solid #2a2a4a;
-      padding-bottom: 1rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .chapter-list {
-      list-style: none;
-    }
-
-    .chapter-list li {
-      margin-bottom: 1.2rem;
-    }
-
-    .chapter-list a {
-      color: #eaeaea;
-      text-decoration: none;
-      font-size: 1.2rem;
-      font-weight: 300;
-      display: block;
-      padding: 1rem 1.5rem;
-      background: #1a1a3a;
-      border-radius: 10px;
-      transition: all 0.3s ease;
-    }
-
-    .chapter-list a:hover {
-      background: #7a63f3;
-      color: #fff;
-      transform: translateX(10px);
-      box-shadow: 0 5px 15px #7a63f366;
-    }
-
-    .chapter-list a span {
-      font-weight: 500;
-      color: #bfbff5;
-      margin-right: 1rem;
-    }
-
-    .chapter-list a:hover span {
-      color: #fff;
-    }
-
-    /* Chapter Reading Page (Example) */
-    .chapter-content {
-      background: #0c0c1d;
-      border: 1px solid #2a2a4a;
-      border-radius: 15px;
-      padding: 2rem 3rem;
-      text-align: left;
-      line-height: 1.8;
-      font-size: 1.1rem;
-      color: #d1d1d1;
-    }
-    
-    .chapter-content p {
-      margin-bottom: 1.5rem;
-    }
-
-    .chapter-header {
-      border-bottom: 1px solid #2a2a4a;
-      margin-bottom: 2rem;
-      padding-bottom: 1.5rem;
-    }
-    
-    .chapter-header h2 {
-      margin-bottom: 0.5rem;
-    }
-    
-    .chapter-header p {
-      font-style: italic;
-      color: #bfbff5;
-      margin-bottom: 0;
-    }
-    
-    /* Placeholder for future TTS */
-    .tts-controls {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 1rem;
-      background: #1a1a3a;
-      border-radius: 10px;
-      margin-bottom: 2rem;
-    }
-    
-    .tts-controls p {
-      margin: 0;
-      color: #bfbff5;
-    }
-
-    /* --- Footer --- */
-    footer {
-      width: 100%;
-      padding: 2rem 1rem;
-      color: #777;
-      font-size: 0.9rem;
-      text-align: center;
-      border-top: 1px solid #2a2a4a;
-      margin-top: 3rem;
     }
   </style>
 </head>
+<body class="text-gray-200 min-h-screen">
 
-<body>
-
-  <header>
-    <div class="moon"></div>
-    <h1 class="site-title" onclick="showPage('home')">Lunarith</h1>
-    <p class="tagline">Where stories dream beneath the moon.</p>
-  </header>
-
-  <nav>
-    <a href="#home" class="nav-link active" onclick="showPage('home', event)">Home</a>
-    <a href="#chapters" class="nav-link" onclick="showPage('chapters', event)">Chapters</a>
-    <a href="#about" class="nav-link" onclick="showPage('about', event)">About</a>
+  <!-- Navigation Bar -->
+  <nav class="bg-gray-900 bg-opacity-30 backdrop-blur-md sticky top-0 z-50">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <!-- Logo/Brand Name -->
+        <div class="flex-shrink-0 flex items-center">
+          <a href="#" class="font-marcellus text-3xl font-bold text-white text-shadow-lg shadow-purple-500/50">
+            Lunarith
+          </a>
+        </div>
+        <!-- Navigation Links (for desktop) -->
+        <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+          <a href="#" class="border-indigo-500 text-white inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Home</a>
+          <a href="#" class="border-transparent text-gray-300 hover:border-gray-300 hover:text-white inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Light Novels</a>
+          <a href="#" class="border-transparent text-gray-300 hover:border-gray-300 hover:text-white inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Manga</a>
+        </div>
+        <!-- Search and User Icon -->
+        <div class="flex items-center">
+          <button class="p-1 rounded-full text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white">
+            <!-- Heroicon: search -->
+            <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </button>
+          <button class="ml-3 p-1 rounded-full text-gray-400 hover:text-white focus:outline-none">
+            <!-- Heroicon: user-circle -->
+            <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </button>
+          <!-- Mobile menu button (hidden) -->
+          <div class="sm:hidden ml-3">
+            <button class="p-2 rounded-md text-gray-400">
+              <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </nav>
 
-  <main>
+  <!-- Main Content -->
+  <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
 
-    <!-- ========= HOME PAGE ========= -->
-    <section id="home" class="page active">
-      <div class="featured-novel">
-        <h2>The Chronicle of the Void Sovereign</h2>
-        <p class="description">
-          Born a 0.00 'rat' in a world of cultivated power, Mael V. Fugth is shattered and left for dead. In an alley of red snow, he forges a new power from pure hatred, creating a Void that devours agony, gods, and eventually... the world.
-        </p>
-        <a href="#chapters" class="btn" onclick="showPage('chapters', event)">Start Reading</a>
+    <!-- Featured Novel Section -->
+    <section class="mb-12">
+      <h2 class="font-marcellus text-3xl font-bold text-white mb-6 border-l-4 border-indigo-500 pl-4">Featured Novel</h2>
+      <div class="relative rounded-lg overflow-hidden bg-gray-900 shadow-2xl shadow-indigo-500/20">
+        <!-- Placeholder for a large cover image -->
+        <img src="https://placehold.co/1200x400/0c0c1d/9c83ff?text=Echoes+of+the+Silver+Night" alt="Featured Novel Cover" class="w-full h-48 md:h-64 object-cover opacity-30">
+        <div class="absolute inset-0 flex flex-col justify-end p-6 md:p-10">
+          <h3 class="font-marcellus text-4xl font-bold text-white mb-2">Echoes of the Silver Night</h3>
+          <p class="text-gray-300 text-lg mb-4 max-w-2xl">A tale of memories, moonlight, and the quiet echoes of forgotten worlds.</p>
+          <div class="flex space-x-4">
+            <a href="#" class="inline-block px-8 py-3 bg-indigo-600 text-white rounded-full font-semibold hover:bg-indigo-500 transition-colors shadow-lg">Read Chapter 1</a>
+            <a href="#" class="inline-block px-8 py-3 bg-gray-700 text-white rounded-full font-semibold hover:bg-gray-600 transition-colors">View Details</a>
+          </div>
+        </div>
       </div>
     </section>
 
-    <!-- ========= CHAPTERS PAGE ========= -->
-    <section id="chapters" class="page">
-      <h2>Novel List</h2>
-      <div class="volume-list">
+    <!-- Latest Updates Section -->
+    <section>
+      <h2 class="font-marcellus text-3xl font-bold text-white mb-6 border-l-4 border-indigo-500 pl-4">Latest Updates</h2>
+      
+      <!-- Grid for Novel Cards -->
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
         
-        <!-- Volume 1 -->
-        <div class="volume">
-          <h3>The Chronicle of the Void Sovereign: Volume 1</h3>
-          <ul class="chapter-list">
-            <li>
-              <!-- 
-                When you're ready to add a chapter, you'll create a new page section like id="chapter-1"
-                and then link to it like this: 
-                <a href="#chapter-1" onclick="showPage('chapter-1', event)">
-              -->
-              <a href="#chapter-1-example" onclick="showPage('chapter-1-example', event)">
-                <span>Chapter 1:</span> The Rat in the Red Snow
-              </a>
-            </li>
-            <li>
-              <a href="#">
-                <span>Chapter 2:</span> The Price of a Rat's Cry
-              </a>
-            </li>
-            <li>
-              <a href="#">
-                <span>Chapter 3:</span> The Scorpion's Venom
-              </a>
-            </li>
-            <!-- Add more chapters as you write them -->
-          </ul>
+        <!-- Novel Card 1 (Your novel) -->
+        <div class="bg-gray-800 bg-opacity-40 rounded-lg overflow-hidden shadow-lg hover:shadow-indigo-500/30 transition-shadow duration-300">
+          <a href="#">
+            <img src="https://placehold.co/500x700/0c0c1d/eaeaea?text=Echoes+of+the+Silver+Night" alt="Novel Cover" class="w-full h-64 object-cover">
+          </a>
+          <div class="p-4">
+            <h4 class="font-marcellus text-lg font-semibold text-white truncate">Echoes of the Silver Night</h4>
+            <div class="flex justify-between text-sm text-gray-400 mt-2">
+              <a href="#" class="hover:text-indigo-400">Chapter 1</a>
+              <span class="text-gray-500">Today</span>
+            </div>
+          </div>
         </div>
 
-        <!-- Add more volumes here -->
+        <!-- Novel Card 2 (Placeholder) -->
+        <div class="bg-gray-800 bg-opacity-40 rounded-lg overflow-hidden shadow-lg hover:shadow-indigo-500/30 transition-shadow duration-300">
+          <a href="#">
+            <img src="https://placehold.co/500x700/1a1a2e/eaeaea?text=Void+Walker" alt="Novel Cover" class="w-full h-64 object-cover">
+          </a>
+          <div class="p-4">
+            <h4 class="font-marcellus text-lg font-semibold text-white truncate">Void Walker</h4>
+            <div class="flex justify-between text-sm text-gray-400 mt-2">
+              <a href="#" class="hover:text-indigo-400">Chapter 42</a>
+              <span class="text-gray-500">1h ago</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Novel Card 3 (Placeholder) -->
+        <div class="bg-gray-800 bg-opacity-40 rounded-lg overflow-hidden shadow-lg hover:shadow-indigo-500/30 transition-shadow duration-300">
+          <a href="#">
+            <img src="https://placehold.co/500x700/1f2833/eaeaea?text=Iron+Heart" alt="Novel Cover" class="w-full h-64 object-cover">
+          </a>
+          <div class="p-4">
+            <h4 class="font-marcellus text-lg font-semibold text-white truncate">The Iron Heart</h4>
+            <div class="flex justify-between text-sm text-gray-400 mt-2">
+              <a href="#" class="hover:text-indigo-400">Chapter 115</a>
+              <span class="text-gray-500">3h ago</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Novel Card 4 (Placeholder) -->
+        <div class="bg-gray-800 bg-opacity-40 rounded-lg overflow-hidden shadow-lg hover:shadow-indigo-500/30 transition-shadow duration-300">
+          <a href="#">
+            <img src="https://placehold.co/500x700/0b0c10/eaeaea?text=Crimson+Blade" alt="Novel Cover" class="w-full h-64 object-cover">
+          </a>
+          <div class="p-4">
+            <h4 class="font-marcellus text-lg font-semibold text-white truncate">Crimson Blade</h4>
+            <div class="flex justify-between text-sm text-gray-400 mt-2">
+              <a href="#" class="hover:text-indigo-400">Chapter 7</a>
+              <span class="text-gray-500">Yesterday</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Novel Card 5 (Placeholder) -->
+        <div class="bg-gray-800 bg-opacity-40 rounded-lg overflow-hidden shadow-lg hover:shadow-indigo-500/30 transition-shadow duration-300">
+          <a href="#">
+            <img src="https://placehold.co/500x700/2c3e50/eaeaea?text=Starfall" alt="Novel Cover" class="w-full h-64 object-cover">
+          </a>
+          <div class="p-4">
+            <h4 class="font-marcellus text-lg font-semibold text-white truncate">Starfall</h4>
+            <div class="flex justify-between text-sm text-gray-400 mt-2">
+              <a href="#" class="hover:text-indigo-400">Chapter 88</a>
+              <span class="text-gray-500">Yesterday</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Novel Card 6 (Placeholder) -->
+        <div class="bg-gray-800 bg-opacity-40 rounded-lg overflow-hidden shadow-lg hover:shadow-indigo-500/30 transition-shadow duration-300">
+          <a href="#">
+            <img src="https://placehold.co/500x700/343a40/eaeaea?text=Rift+Runner" alt="Novel Cover" class="w-full h-64 object-cover">
+          </a>
+          <div class="p-4">
+            <h4 class="font-marcellus text-lg font-semibold text-white truncate">Rift Runner</h4>
+            <div class="flex justify-between text-sm text-gray-400 mt-2">
+              <a href="#" class="hover:text-indigo-400">Chapter 31</a>
+              <span class="text-gray-500">2 days ago</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Add more cards as needed -->
 
       </div>
     </section>
-
-    <!-- ========= ABOUT PAGE ========= -->
-    <section id="about" class="page">
-      <h2>About Lunarith</h2>
-      <p class="description" style="text-align: left;">
-        Lunarith is a passion project, a quiet corner of the internet dedicated to worlds born from dreams and moonlight.
-        <br><br>
-        It was created by [Your Name/Pen Name] as a home for the light novel series "The Chronicle of the Void Sovereign," with plans to expand and host other original stories. Thank you for visiting.
-      </p>
-    </section>
-    
-    
-    <!-- ========= EXAMPLE CHAPTER PAGE ========= -->
-    <!-- 
-      This is a "page" for a single chapter.
-      To add a new chapter:
-      1. Copy this whole <section> block.
-      2. Change the id="chapter-1-example" to something new, like id="chapter-2".
-      3. Update the h2, p, and all the content inside.
-      4. Go back to the #chapters page list and link to your new id.
-    -->
-    <section id="chapter-1-example" class="page">
-      <div class="chapter-header">
-        <p>The Chronicle of the Void Sovereign</p>
-        <h2>Chapter 1: The Rat in the Red Snow</h2>
-      </div>
-
-      <!-- This is where your future Text-to-Speech (TTS) controls will go! -->
-      <div class="tts-controls">
-        <p>Future Text-to-Speech (TTS) Player Here</p>
-      </div>
-
-      <div class="chapter-content">
-        <p>
-          The world of Zhenha runs on World Energy, or Qi. It is the "RAM" of the earth. Cultivators "sync" with it, storing power in their Dantians. Their rank, from a 9th Rate Novice to a 1st Rate Master, is their "allocated" power.
-        </p>
-        <p>
-          Mael, age 5, was an unallocated 0.00. He was a rat, a ghost in the frozen alleys of Iron-Peak City. His world was the gnawing cold in his belly and the hatred he felt for the laughing, well-fed merchants who kicked him.
-        </p>
-        <p>
-          His world *ended* the night he witnessed the massacre of the Silver-Leaf House. Hidden in a trash heap, he saw assassins from the <strong>"Shadow Scorpion"</strong> sect move like ghosts, their green Qi-blades silencing an entire bloodline. He saw a child, his own age, about to be cut down. He did the only thing he could: he screamed. A desperate, childish cry for help.
-        </p>
-        <p>
-          The sound echoed. The assassins froze. A figure appeared instantly before Mael, his aura so intense it melted the snow. He was the 1st Rate Master, the Sect Leader. His eyes were cold, bored, and disgusted. "A rat."
-        </p>
-        <!-- Continue adding your chapter text here -->
-      </div>
-    </section>
-
 
   </main>
 
-  <footer>
-    &copy; 2025 Lunarith. All rights reserved.
+  <!-- Footer -->
+  <footer class="w-full py-8 mt-12 bg-gray-900 bg-opacity-20">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center text-gray-500">
+      <p class="font-marcellus text-xl text-gray-300 mb-2">Lunarith</p>
+      <p class="text-sm mb-4">Where stories dream beneath the moon.</p>
+      <div class="flex justify-center space-x-6 mb-4">
+        <a href="#" class="hover:text-indigo-400">About</a>
+        <a href="#" class="hover:text-indigo-400">Contact</a>
+        <a href="#" class="hover:text-indigo-400">Privacy Policy</a>
+        <a href="#" class="hover:text-indigo-400">Terms of Service</a>
+      </div>
+      <p class="text-xs">&copy; 2025 Lunarith. All rights reserved. This is a fictional site concept.</p>
+    </div>
   </footer>
-
-  <script>
-    // Simple single-page navigation
-    const navLinks = document.querySelectorAll('.nav-link');
-    const pages = document.querySelectorAll('.page');
-
-    function showPage(pageId, event) {
-      if (event) {
-        event.preventDefault(); // Stop the link from changing the URL hash
-      }
-
-      // Hide all pages
-      pages.forEach(page => {
-        page.classList.remove('active');
-      });
-
-      // Show the target page
-      const targetPage = document.getElementById(pageId);
-      if (targetPage) {
-        targetPage.classList.add('active');
-      }
-
-      // Update active state on nav links
-      navLinks.forEach(link => {
-        link.classList.remove('active');
-        if (link.getAttribute('href') === `#${pageId}`) {
-          link.classList.add('active');
-        }
-      });
-      
-      // Scroll to top
-      window.scrollTo(0, 0);
-    }
-    
-    // Show home page by default
-    document.addEventListener('DOMContentLoaded', () => {
-      showPage('home');
-    });
-  </script>
 
 </body>
 </html>
