@@ -1,204 +1,542 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- We'll use Tailwind CSS for a fast, professional layout -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <title>Lunarith | Where stories dream beneath the moon.</title>
-  <style>
-    /* We'll keep your custom fonts */
-    @import url('https://fonts.googleapis.com/css2?family=Marcellus&family=Poppins:wght@300;500;700&display=swap');
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lunarith Story Creator 🌙</title>
+    <style>
+        :root {
+            --bg-deep-space: #0a0a12;
+            --bg-space: #151524;
+            --bg-nebula: #101020;
+            --bg-stars: #eaeaff;
+            --text-color: #eaeaff;
+            --text-muted: #aaa;
+            --accent-primary: #5468ff;
+            --accent-primary-hover: #6b8cff;
+            --accent-danger: #e55;
+            --accent-secondary: #333;
+            --radius-md: 10px;
+            --radius-lg: 12px;
+            --shadow-sm: 0 0 10px rgba(0, 0, 0, .3);
+            --shadow-md: 0 2px 6px rgba(0, 0, 0, .4);
+        }
 
-    body {
-      /* This is your beautiful dark gradient */
-      background: radial-gradient(circle at top, #0c0c1d, #030308);
-      font-family: 'Poppins', sans-serif;
-    }
+        body {
+            background-color: var(--bg-deep-space);
+            color: var(--text-color);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
 
-    /* We'll use Marcellus for titles */
-    .font-marcellus {
-      font-family: 'Marcellus', serif;
-    }
-  </style>
+        header {
+            background: linear-gradient(135deg, #15182f, #0f101d);
+            padding: 20px;
+            text-align: center;
+            box-shadow: var(--shadow-md);
+            border-bottom: 1px solid var(--bg-space);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2rem;
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+            background-color: var(--bg-space);
+            box-shadow: var(--shadow-sm);
+        }
+
+        nav button {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 15px 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: color 0.2s, border-bottom 0.2s;
+            border-bottom: 3px solid transparent;
+        }
+
+        nav button:hover {
+            color: var(--text-color);
+        }
+
+        nav button.active {
+            color: var(--accent-primary-hover);
+            border-bottom: 3px solid var(--accent-primary-hover);
+        }
+
+        main {
+            flex: 1;
+            max-width: 900px;
+            width: 100%;
+            margin: 20px auto;
+            padding: 0 20px;
+            box-sizing: border-box;
+        }
+        
+        /* Tab content styling */
+        .tab-content {
+            display: none; /* Hidden by default */
+        }
+        .tab-content.active {
+            display: block; /* Shown when active */
+        }
+
+        section {
+            background: var(--bg-space);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            margin: 15px 0;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .grid-col-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        h2, h3 {
+            margin-top: 0;
+            border-bottom: 1px solid var(--bg-nebula);
+            padding-bottom: 10px;
+        }
+
+        textarea, input[type="text"], input[type="url"], select {
+            width: 100%;
+            border: none;
+            border-radius: var(--radius-md);
+            padding: 12px;
+            margin: 8px 0;
+            background: var(--bg-nebula);
+            color: var(--text-color);
+            resize: vertical;
+            box-sizing: border-box; /* Ensures padding doesn't affect width */
+            font-size: 1rem;
+        }
+
+        textarea { min-height: 160px; }
+        textarea#storyContext { min-height: 300px; }
+        textarea#instruction { min-height: 80px; }
+
+        button {
+            border: none;
+            border-radius: var(--radius-md);
+            padding: 10px 16px;
+            margin: 5px;
+            cursor: pointer;
+            transition: 0.25s all;
+            font-weight: 600;
+        }
+
+        button:hover { opacity: 0.9; }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .primary { background: var(--accent-primary); color: #fff; }
+        .danger { background: var(--accent-danger); color: #fff; }
+        .secondary { background: var(--accent-secondary); color: #fff; }
+
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        
+        #response, #storyDisplay {
+            background: var(--bg-nebula);
+            border: 1px dashed var(--accent-secondary);
+            padding: 15px;
+            border-radius: var(--radius-md);
+            margin-top: 15px;
+            white-space: pre-wrap;
+            line-height: 1.5;
+            min-height: 100px;
+            word-wrap: break-word;
+        }
+        
+        #storyDisplay {
+            background: var(--bg-deep-space);
+            border: none;
+            min-height: 400px;
+        }
+
+        /* Status Ping Circle */
+        #statusWrapper {
+            display: inline-flex;
+            align-items: center;
+            margin-left: 10px;
+        }
+        #statusBtn {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            transition: background-color 0.3s;
+        }
+        
+        label {
+            display: block;
+            font-weight: 600;
+            margin: 10px 0 5px;
+        }
+
+        footer {
+            background: #0f101d;
+            color: var(--text-muted);
+            text-align: center;
+            font-size: .9em;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        footer a { color: var(--accent-primary-hover); text-decoration: none; }
+    </style>
 </head>
-<body class="text-gray-200 min-h-screen">
+<body>
+    <header>
+        <h1>🌙 Lunarith Story Creator</h1>
+        <p>Where stories dream beneath the moon</p>
+    </header>
 
-  <!-- Navigation Bar -->
-  <nav class="bg-gray-900 bg-opacity-30 backdrop-blur-md sticky top-0 z-50">
-    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex justify-between items-center h-16">
-        <!-- Logo/Brand Name -->
-        <div class="flex-shrink-0 flex items-center">
-          <a href="#" class="font-marcellus text-3xl font-bold text-white text-shadow-lg shadow-purple-500/50">
-            Lunarith
-          </a>
-        </div>
-        <!-- Navigation Links (for desktop) -->
-        <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
-          <a href="#" class="border-indigo-500 text-white inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Home</a>
-          <a href="#" class="border-transparent text-gray-300 hover:border-gray-300 hover:text-white inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Light Novels</a>
-          <a href="#" class="border-transparent text-gray-300 hover:border-gray-300 hover:text-white inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Manga</a>
-        </div>
-        <!-- Search and User Icon -->
-        <div class="flex items-center">
-          <button class="p-1 rounded-full text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white">
-            <!-- Heroicon: search -->
-            <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </button>
-          <button class="ml-3 p-1 rounded-full text-gray-400 hover:text-white focus:outline-none">
-            <!-- Heroicon: user-circle -->
-            <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </button>
-          <!-- Mobile menu button (hidden) -->
-          <div class="sm:hidden ml-3">
-            <button class="p-2 rounded-md text-gray-400">
-              <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
-              </svg>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </nav>
+    <nav>
+        <button id="navReader" class="tab-nav active">📖 Reader</button>
+        <button id="navCreator" class="tab-nav">✨ Creator Studio</button>
+    </nav>
 
-  <!-- Main Content -->
-  <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
-
-    <!-- Featured Novel Section -->
-    <section class="mb-12">
-      <h2 class="font-marcellus text-3xl font-bold text-white mb-6 border-l-4 border-indigo-500 pl-4">Featured Novel</h2>
-      <div class="relative rounded-lg overflow-hidden bg-gray-900 shadow-2xl shadow-indigo-500/20">
-        <!-- Placeholder for a large cover image -->
-        <img src="https://placehold.co/1200x400/0c0c1d/9c83ff?text=Echoes+of+the+Silver+Night" alt="Featured Novel Cover" class="w-full h-48 md:h-64 object-cover opacity-30">
-        <div class="absolute inset-0 flex flex-col justify-end p-6 md:p-10">
-          <h3 class="font-marcellus text-4xl font-bold text-white mb-2">Echoes of the Silver Night</h3>
-          <p class="text-gray-300 text-lg mb-4 max-w-2xl">A tale of memories, moonlight, and the quiet echoes of forgotten worlds.</p>
-          <div class="flex space-x-4">
-            <a href="#" class="inline-block px-8 py-3 bg-indigo-600 text-white rounded-full font-semibold hover:bg-indigo-500 transition-colors shadow-lg">Read Chapter 1</a>
-            <a href="#" class="inline-block px-8 py-3 bg-gray-700 text-white rounded-full font-semibold hover:bg-gray-600 transition-colors">View Details</a>
-          </div>
+    <main>
+        <div id="readerTab" class="tab-content active">
+            <section id="story-reader">
+                <h2>📚 Read Your Stories</h2>
+                <label for="storyListReader">Select a story to read:</label>
+                <select id="storyListReader"></select>
+                <div id="storyDisplay">Select a story from the list to display its content here.</div>
+            </section>
         </div>
-      </div>
-    </section>
 
-    <!-- Latest Updates Section -->
-    <section>
-      <h2 class="font-marcellus text-3xl font-bold text-white mb-6 border-l-4 border-indigo-500 pl-4">Latest Updates</h2>
-      
-      <!-- Grid for Novel Cards -->
-      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
+        <div id="creatorTab" class="tab-content">
+            <section id="api-settings">
+                <h3>⚙️ Backend & Model Settings</h3>
+                <label for="apiUrl">Backend API URL:</label>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <input type="url" id="apiUrl" value="https://fugthchat-fugthdes.hf.space">
+                    <button id="pingBtn" class="secondary" title="Ping API">
+                        <span id="statusBtn"></span> Ping
+                    </button>
+                </div>
+                
+                <label for="modelSelector">Select GGUF Model:</label>
+                <select id="modelSelector">
+                    <option value="tinyllama">TinyLlama 1.1B (Q3_K_S)</option>
+                    <option value="stablelm-zephyr-3b">StableLM Zephyr 3B (Q3_K_S)</option>
+                </select>
+            </section>
+            
+            <section id="story-management">
+                <h3>🗂️ Story Management</h3>
+                <label for="storyListCreator">Current Active Story:</label>
+                <select id="storyListCreator"></select>
+                <div class="button-group">
+                    <button id="newStoryBtn" class="secondary">➕ New Story</button>
+                    <button id="saveBtn" class="secondary">💾 Save Content</button>
+                    <button id="deleteStoryBtn" class="danger">🗑 Delete Story</button>
+                </div>
+            </section>
+
+            <section id="story-editor">
+                <h2 id="storyTitle">No Story Selected</h2>
+                
+                <label for="storyContext">Full Story Context:</label>
+                <textarea id="storyContext" placeholder="Create or select a story. Its content will appear here..."></textarea>
+                
+                <label for="instruction">Generation Instruction:</label>
+                <textarea id="instruction" placeholder="e.g., Write the next chapter.&#10;e.g., Rewrite the last paragraph to be more exciting.&#10;e.g., Add a description of the main character's doubts."></textarea>
+                
+                <button id="generateBtn" class="primary" style="width: 100%; padding: 15px; font-size: 1.1rem;">
+                    ✨ Generate
+                </button>
+                
+                <h3>🤖 Generated Text:</h3>
+                <pre id="response"></pre>
+                <button id="appendBtn" class="secondary">⬇️ Append to Story</button>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        Built by <b>FugthChat</b> • Powered by
+        <a href="https://huggingface.co/" target="_blank">Hugging Face</a>
+    </footer>
+
+<script>
+// --- DOM Elements ---
+const navReader = document.getElementById('navReader');
+const navCreator = document.getElementById('navCreator');
+const readerTab = document.getElementById('readerTab');
+const creatorTab = document.getElementById('creatorTab');
+
+const storyListReader = document.getElementById('storyListReader');
+const storyDisplay = document.getElementById('storyDisplay');
+
+const apiUrlInput = document.getElementById('apiUrl');
+const pingBtn = document.getElementById('pingBtn');
+const statusBtn = document.getElementById('statusBtn');
+const modelSelector = document.getElementById('modelSelector');
+const storyListCreator = document.getElementById('storyListCreator');
+const newStoryBtn = document.getElementById('newStoryBtn');
+const deleteStoryBtn = document.getElementById('deleteStoryBtn');
+const saveBtn = document.getElementById('saveBtn');
+const storyTitle = document.getElementById('storyTitle');
+const storyContext = document.getElementById('storyContext');
+const instruction = document.getElementById('instruction');
+const generateBtn = document.getElementById('generateBtn');
+const responseDiv = document.getElementById('response');
+const appendBtn = document.getElementById('appendBtn');
+
+// --- App State ---
+let stories = JSON.parse(localStorage.getItem("stories") || "{}");
+let currentStory = null;
+let isGenerating = false;
+
+// --- Model Definitions ---
+const GGUF_MODELS = {
+    "tinyllama": {
+        repo: "TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF",
+        file: "tinyllama-1.1b-chat-v1.0.Q3_K_S.gguf",
+        chat_format: "zephyr"
+    },
+    "stablelm-zephyr-3b": {
+        repo: "TheBloke/stablelm-zephyr-3b-GGUF",
+        file: "stablelm-zephyr-3b.Q3_K_S.gguf",
+        chat_format: "zephyr"
+    }
+};
+
+// --- Tab Navigation ---
+navReader.onclick = () => {
+    navReader.classList.add('active');
+    navCreator.classList.remove('active');
+    readerTab.classList.add('active');
+    creatorTab.classList.remove('active');
+    updateStoryList(); // Refresh reader list
+};
+navCreator.onclick = () => {
+    navCreator.classList.add('active');
+    navReader.classList.remove('active');
+    creatorTab.classList.add('active');
+    readerTab.classList.remove('active');
+    updateStoryList(); // Refresh creator list
+};
+
+// --- API & Status ---
+function setStatus(color, title) {
+    statusBtn.style.background = color;
+    pingBtn.title = title;
+}
+
+async function checkConnection() {
+    const API_URL = apiUrlInput.value.trim();
+    if (!API_URL) {
+        setStatus("red", "API URL is empty");
+        return false;
+    }
+    
+    setStatus("yellow", "Connecting...");
+    generateBtn.disabled = true;
+    try {
+        const res = await fetch(API_URL + "/", { method: "GET" });
+        if (res.ok) {
+            setStatus("limegreen", "Connected to backend");
+            generateBtn.disabled = isGenerating; // Only enable if not already generating
+            return true;
+        } else {
+            throw new Error("Bad response");
+        }
+    } catch (e) {
+        setStatus("red", "Not connected");
+        generateBtn.disabled = true;
+        return false;
+    }
+}
+pingBtn.onclick = checkConnection;
+
+// --- Story Management ---
+function updateStoryList() {
+    // Clear both lists
+    storyListReader.innerHTML = '<option value="">-- Select a story --</option>';
+    storyListCreator.innerHTML = '<option value="">-- Select a story --</option>';
+    
+    for (let title in stories) {
+        const optReader = document.createElement("option");
+        optReader.value = title;
+        optReader.textContent = title;
+        storyListReader.appendChild(optReader);
         
-        <!-- Novel Card 1 (Your novel) -->
-        <div class="bg-gray-800 bg-opacity-40 rounded-lg overflow-hidden shadow-lg hover:shadow-indigo-500/30 transition-shadow duration-300">
-          <a href="#">
-            <img src="https://placehold.co/500x700/0c0c1d/eaeaea?text=Echoes+of+the+Silver+Night" alt="Novel Cover" class="w-full h-64 object-cover">
-          </a>
-          <div class="p-4">
-            <h4 class="font-marcellus text-lg font-semibold text-white truncate">Echoes of the Silver Night</h4>
-            <div class="flex justify-between text-sm text-gray-400 mt-2">
-              <a href="#" class="hover:text-indigo-400">Chapter 1</a>
-              <span class="text-gray-500">Today</span>
-            </div>
-          </div>
-        </div>
+        const optCreator = document.createElement("option");
+        optCreator.value = title;
+        optCreator.textContent = title;
+        storyListCreator.appendChild(optCreator);
+    }
+    
+    // Reselect current story in both
+    if (currentStory) {
+        storyListReader.value = currentStory;
+        storyListCreator.value = currentStory;
+    }
+}
 
-        <!-- Novel Card 2 (Placeholder) -->
-        <div class="bg-gray-800 bg-opacity-40 rounded-lg overflow-hidden shadow-lg hover:shadow-indigo-500/30 transition-shadow duration-300">
-          <a href="#">
-            <img src="https://placehold.co/500x700/1a1a2e/eaeaea?text=Void+Walker" alt="Novel Cover" class="w-full h-64 object-cover">
-          </a>
-          <div class="p-4">
-            <h4 class="font-marcellus text-lg font-semibold text-white truncate">Void Walker</h4>
-            <div class="flex justify-between text-sm text-gray-400 mt-2">
-              <a href="#" class="hover:text-indigo-400">Chapter 42</a>
-              <span class="text-gray-500">1h ago</span>
-            </div>
-          </div>
-        </div>
+function saveStories() {
+    localStorage.setItem("stories", JSON.stringify(stories));
+}
 
-        <!-- Novel Card 3 (Placeholder) -->
-        <div class="bg-gray-800 bg-opacity-40 rounded-lg overflow-hidden shadow-lg hover:shadow-indigo-500/30 transition-shadow duration-300">
-          <a href="#">
-            <img src="https://placehold.co/500x700/1f2833/eaeaea?text=Iron+Heart" alt="Novel Cover" class="w-full h-64 object-cover">
-          </a>
-          <div class="p-4">
-            <h4 class="font-marcellus text-lg font-semibold text-white truncate">The Iron Heart</h4>
-            <div class="flex justify-between text-sm text-gray-400 mt-2">
-              <a href="#" class="hover:text-indigo-400">Chapter 115</a>
-              <span class="text-gray-500">3h ago</span>
-            </div>
-          </div>
-        </div>
+function loadStory(title) {
+    if (!title) {
+        currentStory = null;
+        storyTitle.textContent = "No Story Selected";
+        storyContext.value = "";
+        storyDisplay.textContent = "Select a story from the list to display its content here.";
+        return;
+    }
+    currentStory = title;
+    storyTitle.textContent = title;
+    const content = stories[currentStory]?.content || "";
+    storyContext.value = content;
+    storyDisplay.textContent = content; // Update reader tab
+    responseDiv.innerText = "";
+    instruction.value = "";
+}
 
-        <!-- Novel Card 4 (Placeholder) -->
-        <div class="bg-gray-800 bg-opacity-40 rounded-lg overflow-hidden shadow-lg hover:shadow-indigo-500/30 transition-shadow duration-300">
-          <a href="#">
-            <img src="https://placehold.co/500x700/0b0c10/eaeaea?text=Crimson+Blade" alt="Novel Cover" class="w-full h-64 object-cover">
-          </a>
-          <div class="p-4">
-            <h4 class="font-marcellus text-lg font-semibold text-white truncate">Crimson Blade</h4>
-            <div class="flex justify-between text-sm text-gray-400 mt-2">
-              <a href="#" class="hover:text-indigo-400">Chapter 7</a>
-              <span class="text-gray-500">Yesterday</span>
-            </div>
-          </div>
-        </div>
+// --- Event Listeners ---
+storyListReader.onchange = () => loadStory(storyListReader.value);
+storyListCreator.onchange = () => loadStory(storyListCreator.value);
+
+newStoryBtn.onclick = () => {
+    const title = prompt("Enter new story title:");
+    if (!title || title.trim() === "") return;
+    if (stories[title]) {
+        alert("A story with this title already exists.");
+        return;
+    }
+    stories[title] = { content: "" };
+    saveStories();
+    loadStory(title);
+    updateStoryList();
+};
+
+deleteStoryBtn.onclick = () => {
+    if (!currentStory) return alert("No story selected!");
+    if (confirm(`Are you sure you want to permanently delete "${currentStory}"?`)) {
+        delete stories[currentStory];
+        saveStories();
+        loadStory(null); // Load empty state
+        updateStoryList();
+    }
+};
+
+saveBtn.onclick = () => {
+    if (!currentStory) return alert("Create or select a story first.");
+    stories[currentStory].content = storyContext.value;
+    saveStories();
+    // Re-load to update reader tab
+    loadStory(currentStory);
+    alert("✅ Story saved!");
+};
+
+appendBtn.onclick = () => {
+    const newText = responseDiv.innerText.trim();
+    if (newText) {
+        storyContext.value += "\n\n" + newText;
+        responseDiv.innerText = ""; // Clear response box
+    }
+};
+
+// --- AI Generation ---
+generateBtn.onclick = async () => {
+    if (!currentStory) return alert("Select or create a story first!");
+    if (isGenerating) return;
+
+    const API_URL = apiUrlInput.value.trim();
+    const context = storyContext.value.trim();
+    const instruct = instruction.value.trim();
+    
+    if (!instruct) return alert("Please provide an instruction.");
+    
+    responseDiv.innerText = "⏳ Connecting to AI...";
+    isGenerating = true;
+    generateBtn.disabled = true;
+    generateBtn.textContent = "Generating...";
+
+    const connected = await checkConnection();
+    if (!connected) {
+        responseDiv.innerText = "❌ Could not connect to backend.";
+        isGenerating = false;
+        generateBtn.textContent = "✨ Generate";
+        return;
+    }
+    
+    responseDiv.innerText = "✨ Sending prompt to model... This may take a few minutes.";
+
+    // Get selected model info
+    const modelKey = modelSelector.value;
+    const model = GGUF_MODELS[modelKey];
+
+    // --- Prompt Engineering ---
+    // Format the prompt according to the model's chat format
+    let fullPrompt = "";
+    if (model.chat_format === "zephyr") {
+        fullPrompt = `<|user|>\nHere is the story so far:\n${context}\n\nMy instruction is:\n${instruct}\n\nPlease continue the story based on my instruction.<|endoftext|>\n<|assistant|>`;
+    } else {
+        // Default simple prompt
+        fullPrompt = `Story:\n${context}\n\nInstruction:\n${instruct}\n\nResponse:`;
+    }
+
+    try {
+        const res = await fetch(API_URL + "/generate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                // Send the model info and the formatted prompt
+                model_repo: model.repo,
+                model_file: model.file,
+                prompt: fullPrompt,
+                max_tokens: 512 // You can make this an input field later
+            })
+        });
+
+        if (!res.ok) {
+            throw new Error(`Server responded with status: ${res.status}`);
+        }
         
-        <!-- Novel Card 5 (Placeholder) -->
-        <div class="bg-gray-800 bg-opacity-40 rounded-lg overflow-hidden shadow-lg hover:shadow-indigo-500/30 transition-shadow duration-300">
-          <a href="#">
-            <img src="https://placehold.co/500x700/2c3e50/eaeaea?text=Starfall" alt="Novel Cover" class="w-full h-64 object-cover">
-          </a>
-          <div class="p-4">
-            <h4 class="font-marcellus text-lg font-semibold text-white truncate">Starfall</h4>
-            <div class="flex justify-between text-sm text-gray-400 mt-2">
-              <a href="#" class="hover:text-indigo-400">Chapter 88</a>
-              <span class="text-gray-500">Yesterday</span>
-            </div>
-          </div>
-        </div>
+        const data = await res.json();
+        
+        if (data.error) {
+            throw new Error(data.error);
+        }
 
-        <!-- Novel Card 6 (Placeholder) -->
-        <div class="bg-gray-800 bg-opacity-40 rounded-lg overflow-hidden shadow-lg hover:shadow-indigo-500/30 transition-shadow duration-300">
-          <a href="#">
-            <img src="https://placehold.co/500x700/343a40/eaeaea?text=Rift+Runner" alt="Novel Cover" class="w-full h-64 object-cover">
-          </a>
-          <div class="p-4">
-            <h4 class="font-marcellus text-lg font-semibold text-white truncate">Rift Runner</h4>
-            <div class="flex justify-between text-sm text-gray-400 mt-2">
-              <a href="#" class="hover:text-indigo-400">Chapter 31</a>
-              <span class="text-gray-500">2 days ago</span>
-            </div>
-          </div>
-        </div>
+        const newText = data.story_text || "⚠️ No response or empty response from model.";
+        responseDiv.innerText = newText;
+        setStatus("limegreen", "Generation complete!");
 
-        <!-- Add more cards as needed -->
+    } catch (err) {
+        console.error(err);
+        setStatus("red", "Error during generation");
+        responseDiv.innerText = `❌ An error occurred: ${err.message}`;
+    } finally {
+        isGenerating = false;
+        generateBtn.disabled = false;
+        generateBtn.textContent = "✨ Generate";
+    }
+};
 
-      </div>
-    </section>
-
-  </main>
-
-  <!-- Footer -->
-  <footer class="w-full py-8 mt-12 bg-gray-900 bg-opacity-20">
-    <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center text-gray-500">
-      <p class="font-marcellus text-xl text-gray-300 mb-2">Lunarith</p>
-      <p class="text-sm mb-4">Where stories dream beneath the moon.</p>
-      <div class="flex justify-center space-x-6 mb-4">
-        <a href="#" class="hover:text-indigo-400">About</a>
-        <a href="#" class="hover:text-indigo-400">Contact</a>
-        <a href="#" class="hover:text-indigo-400">Privacy Policy</a>
-        <a href="#" class="hover:text-indigo-400">Terms of Service</a>
-      </div>
-      <p class="text-xs">&copy; 2025 Lunarith. All rights reserved. This is a fictional site concept.</p>
-    </div>
-  </footer>
-
+// --- Initialize ---
+updateStoryList();
+checkConnection();
+</script>
 </body>
 </html>
