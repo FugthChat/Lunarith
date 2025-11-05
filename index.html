@@ -3,540 +3,1225 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lunarith Story Creator 🌙</title>
+    <title>Lunarith Creator</title>
     <style>
         :root {
-            --bg-deep-space: #0a0a12;
-            --bg-space: #151524;
-            --bg-nebula: #101020;
-            --bg-stars: #eaeaff;
-            --text-color: #eaeaff;
-            --text-muted: #aaa;
-            --accent-primary: #5468ff;
-            --accent-primary-hover: #6b8cff;
-            --accent-danger: #e55;
-            --accent-secondary: #333;
-            --radius-md: 10px;
-            --radius-lg: 12px;
-            --shadow-sm: 0 0 10px rgba(0, 0, 0, .3);
-            --shadow-md: 0 2px 6px rgba(0, 0, 0, .4);
+            --bg-primary: #0F0F0F;
+            --bg-secondary: #1A1A1A;
+            --bg-tertiary: #2C2C2C;
+            --text-primary: #EAEAEA;
+            --text-secondary: #999999;
+            --accent-primary: #FF4500; /* Bright Orange */
+            --accent-hover: #FF6A29;
+            --border-color: #333333;
+            --radius: 8px;
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
         }
-
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { height: 100%; }
         body {
-            background-color: var(--bg-deep-space);
-            color: var(--text-color);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            margin: 0;
+            font-family: var(--font-family);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
             display: flex;
             flex-direction: column;
-            min-height: 100vh;
+            line-height: 1.6;
         }
-
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-secondary); }
+        ::-webkit-scrollbar-thumb { background-color: var(--accent-primary); border-radius: 4px; }
         header {
-            background: linear-gradient(135deg, #15182f, #0f101d);
-            padding: 20px;
-            text-align: center;
-            box-shadow: var(--shadow-md);
-            border-bottom: 1px solid var(--bg-space);
-        }
-
-        header h1 {
-            margin: 0;
-            font-size: 2rem;
-        }
-
-        nav {
             display: flex;
-            justify-content: center;
-            background-color: var(--bg-space);
-            box-shadow: var(--shadow-sm);
-        }
-
-        nav button {
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            padding: 15px 25px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: color 0.2s, border-bottom 0.2s;
-            border-bottom: 3px solid transparent;
-        }
-
-        nav button:hover {
-            color: var(--text-color);
-        }
-
-        nav button.active {
-            color: var(--accent-primary-hover);
-            border-bottom: 3px solid var(--accent-primary-hover);
-        }
-
-        main {
-            flex: 1;
-            max-width: 900px;
-            width: 100%;
-            margin: 20px auto;
-            padding: 0 20px;
-            box-sizing: border-box;
-        }
-        
-        /* Tab content styling */
-        .tab-content {
-            display: none; /* Hidden by default */
-        }
-        .tab-content.active {
-            display: block; /* Shown when active */
-        }
-
-        section {
-            background: var(--bg-space);
-            border-radius: var(--radius-lg);
-            padding: 20px;
-            margin: 15px 0;
-            box-shadow: var(--shadow-sm);
-        }
-        
-        .grid-col-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-
-        h2, h3 {
-            margin-top: 0;
-            border-bottom: 1px solid var(--bg-nebula);
-            padding-bottom: 10px;
-        }
-
-        textarea, input[type="text"], input[type="url"], select {
-            width: 100%;
-            border: none;
-            border-radius: var(--radius-md);
-            padding: 12px;
-            margin: 8px 0;
-            background: var(--bg-nebula);
-            color: var(--text-color);
-            resize: vertical;
-            box-sizing: border-box; /* Ensures padding doesn't affect width */
-            font-size: 1rem;
-        }
-
-        textarea { min-height: 160px; }
-        textarea#storyContext { min-height: 300px; }
-        textarea#instruction { min-height: 80px; }
-
-        button {
-            border: none;
-            border-radius: var(--radius-md);
-            padding: 10px 16px;
-            margin: 5px;
-            cursor: pointer;
-            transition: 0.25s all;
-            font-weight: 600;
-        }
-
-        button:hover { opacity: 0.9; }
-        button:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        .primary { background: var(--accent-primary); color: #fff; }
-        .danger { background: var(--accent-danger); color: #fff; }
-        .secondary { background: var(--accent-secondary); color: #fff; }
-
-        .button-group {
-            display: flex;
-            flex-wrap: wrap;
-            margin-top: 10px;
-        }
-        
-        #response, #storyDisplay {
-            background: var(--bg-nebula);
-            border: 1px dashed var(--accent-secondary);
-            padding: 15px;
-            border-radius: var(--radius-md);
-            margin-top: 15px;
-            white-space: pre-wrap;
-            line-height: 1.5;
-            min-height: 100px;
-            word-wrap: break-word;
-        }
-        
-        #storyDisplay {
-            background: var(--bg-deep-space);
-            border: none;
-            min-height: 400px;
-        }
-
-        /* Status Ping Circle */
-        #statusWrapper {
-            display: inline-flex;
+            justify-content: space-between;
             align-items: center;
-            margin-left: 10px;
+            padding: 1rem 2rem;
+            background-color: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+            flex-shrink: 0;
         }
-        #statusBtn {
+        .logo { font-size: 1.75rem; font-weight: 700; }
+        .logo span { color: var(--accent-primary); }
+        .tab-buttons { display: flex; gap: 0.5rem; }
+        .tab-btn {
+            font-family: var(--font-family);
+            font-size: 1rem;
+            font-weight: 600;
+            padding: 0.5rem 1.25rem;
+            background: transparent;
+            color: var(--text-secondary);
+            border: 0;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            transition: color 0.2s, border-color 0.2s;
+        }
+        .tab-btn:hover { color: var(--text-primary); }
+        .tab-btn.active { color: var(--accent-primary); border-bottom-color: var(--accent-primary); }
+        main { flex-grow: 1; overflow-y: auto; padding: 2rem; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        h1, h2, h3 { color: var(--text-primary); margin-bottom: 1rem; }
+        h2 { border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; }
+        button {
+            font-family: var(--font-family);
+            font-size: 0.9rem;
+            font-weight: 600;
+            padding: 0.6rem 1rem;
+            border-radius: var(--radius);
+            border: 0;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+        }
+        .btn-primary { background-color: var(--accent-primary); color: #FFF; }
+        .btn-primary:hover { background-color: var(--accent-hover); box-shadow: 0 0 15px rgba(255, 69, 0, 0.5); }
+        .btn-secondary { background-color: var(--bg-tertiary); color: var(--text-primary); }
+        .btn-secondary:hover { background-color: #444; }
+        button:disabled {
+            background-color: var(--bg-tertiary) !important;
+            color: var(--text-secondary) !important;
+            opacity: 0.6;
+            cursor: not-allowed !important;
+            box-shadow: none !important;
+        }
+        input, textarea, select {
+            font-family: var(--font-family);
+            width: 100%;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+        textarea { min-height: 150px; resize: vertical; }
+        label { display: block; font-weight: 600; margin-bottom: 0.5rem; }
+        .button-group { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+        .story-library-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 1.5rem;
+        }
+        .story-card {
+            background-color: var(--bg-secondary);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+        .story-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6); }
+        .story-card-cover {
+            width: 100%;
+            height: 320px;
+            object-fit: cover;
+            border-bottom: 3px solid var(--accent-primary);
+        }
+        .story-card-content { padding: 1rem; }
+        .story-card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 0.25rem;
+        }
+        .story-card-author { font-size: 0.9rem; color: var(--text-secondary); }
+        .reader-view {
+            display: none; /* Hidden by default */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-primary);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+        }
+        .reader-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background-color: var(--bg-secondary);
+            box-shadow: var(--shadow);
+            flex-shrink: 0;
+        }
+        .reader-title { font-size: 1.5rem; font-weight: 600; }
+        .reader-content-wrapper {
+            flex-grow: 1;
+            overflow-y: auto;
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .reader-breadcrumbs { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1.5rem; }
+        .reader-breadcrumbs span { cursor: pointer; }
+        .reader-breadcrumbs span:hover { color: var(--accent-primary); }
+        .reader-text { font-size: 1.15rem; line-height: 1.8; }
+        .reader-text p { margin-bottom: 1.5rem; }
+        .reader-text .tts-highlight { background-color: var(--accent-primary); color: #FFF; transition: background-color 0.1s ease-in-out; }
+        .reader-choices { margin-top: 2rem; border-top: 1px solid var(--border-color); padding-top: 2rem; }
+        .reader-choices h3 { color: var(--text-secondary); }
+        .choice-btn {
+            display: block;
+            width: 100%;
+            text-align: left;
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+            padding: 1rem;
+            text-transform: none;
+        }
+        .tts-player {
+            background-color: var(--bg-secondary);
+            padding: 1rem;
+            border-radius: var(--radius);
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+        .tts-controls-main { display: flex; gap: 0.75rem; align-items: center; margin-bottom: 1rem; }
+        .tts-controls-main button { font-size: 1.25rem; width: 44px; height: 44px; padding: 0; }
+        .tts-status { color: var(--text-secondary); font-style: italic; }
+        .tts-controls-settings { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+        @media (min-width: 600px) { .tts-controls-settings { grid-template-columns: 1fr 1fr; } }
+        .tts-setting { display: flex; flex-direction: column; }
+        .tts-setting label { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.25rem; }
+        .tts-setting select, .tts-setting input[type="range"] { margin: 0; padding: 0.5rem; }
+        .creator-layout { display: grid; grid-template-columns: 1fr; gap: 2rem; height: 100%; }
+        @media (min-width: 1024px) { .creator-layout { grid-template-columns: 350px 1fr; } }
+        .creator-sidebar, .creator-main {
+            background-color: var(--bg-secondary);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+        .creator-sidebar h2, .creator-main h2 { margin-top: 0; }
+        .status-light {
             width: 12px;
             height: 12px;
             border-radius: 50%;
-            border: 2px solid #fff;
+            display: inline-block;
+            margin-right: 0.5rem;
+            border: 1px solid #111;
+            background-color: var(--text-secondary);
             transition: background-color 0.3s;
         }
-        
-        label {
-            display: block;
-            font-weight: 600;
-            margin: 10px 0 5px;
-        }
-
-        footer {
-            background: #0f101d;
-            color: var(--text-muted);
-            text-align: center;
-            font-size: .9em;
-            padding: 15px;
-            margin-top: 20px;
-        }
-        footer a { color: var(--accent-primary-hover); text-decoration: none; }
+        .status-light.connecting { background-color: #E6A23C; /* Yellow */ }
+        .status-light.connected { background-color: #67C23A; /* Green */ }
+        .status-light.error { background-color: #F56C6C; /* Red */ }
+        #status-text { color: var(--text-secondary); }
+        .story-tree-container { margin-top: 1.5rem; border-top: 1px solid var(--border-color); padding-top: 1rem; }
+        .story-tree { list-style: none; padding-left: 0; }
+        .story-tree ul { list-style: none; padding-left: 1.5rem; border-left: 1px dashed var(--border-color); margin-left: 0.5rem; }
+        .tree-node { padding: 0.5rem; border-radius: 6px; cursor: pointer; transition: background-color 0.2s; }
+        .tree-node:hover { background-color: var(--bg-tertiary); }
+        .tree-node.active { background-color: var(--accent-primary); color: #FFF; font-weight: 600; }
+        .choice-editor-item { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; }
+        .choice-editor-item input { flex-grow: 1; margin-bottom: 0; }
+        .choice-editor-item button { flex-shrink: 0; padding: 0.5rem; font-size: 0.8rem; height: 44px; }
+        .ai-panel fieldset { border: 1px solid var(--border-color); border-radius: var(--radius); padding: 1rem; }
+        .ai-panel legend { font-size: 1.1rem; font-weight: 600; color: var(--accent-primary); padding: 0 0.5rem; }
     </style>
 </head>
 <body>
+
+    <!-- ======================= -->
+    <!-- ===== HEADER & NAV ==== -->
+    <!-- ======================= -->
     <header>
-        <h1>🌙 Lunarith Story Creator</h1>
-        <p>Where stories dream beneath the moon</p>
+        <div class="logo">Lunarith<span>.</span></div>
+        <div class="tab-buttons">
+            <button class="tab-btn active" data-tab="reader-tab">📖 Reader</button>
+            <button class="tab-btn" data-tab="creator-tab">✨ Creator</button>
+        </div>
     </header>
 
-    <nav>
-        <button id="navReader" class="tab-nav active">📖 Reader</button>
-        <button id="navCreator" class="tab-nav">✨ Creator Studio</button>
-    </nav>
-
+    <!-- ======================= -->
+    <!-- ===== MAIN CONTENT ==== -->
+    <!-- ======================= -->
     <main>
-        <div id="readerTab" class="tab-content active">
-            <section id="story-reader">
-                <h2>📚 Read Your Stories</h2>
-                <label for="storyListReader">Select a story to read:</label>
-                <select id="storyListReader"></select>
-                <div id="storyDisplay">Select a story from the list to display its content here.</div>
-            </section>
+        <!-- ======================= -->
+        <!-- ===== READER TAB ====== -->
+        <!-- ======================= -->
+        <div id="reader-tab" class="tab-content active">
+            <h1>Story Library</h1>
+            
+            <h2 style="color: var(--accent-primary); border-bottom-color: var(--accent-primary);">Featured Stories</h2>
+            <div class="story-library-grid" id="featured-story-grid">
+                <!-- Featured stories from /stories/index.json go here -->
+            </div>
+            
+            <h2 style="margin-top: 2rem;">Your Creations</h2>
+            <div class="story-library-grid" id="user-story-grid">
+                <!-- User's local stories go here -->
+            </div>
         </div>
 
-        <div id="creatorTab" class="tab-content">
-            <section id="api-settings">
-                <h3>⚙️ Backend & Model Settings</h3>
-                <label for="apiUrl">Backend API URL:</label>
-                <div style="display: flex; gap: 10px; align-items: center;">
-                    <input type="url" id="apiUrl" value="https://fugthchat-fugthdes.hf.space">
-                    <button id="pingBtn" class="secondary" title="Ping API">
-                        <span id="statusBtn"></span> Ping
-                    </button>
-                </div>
-                
-                <label for="modelSelector">Select GGUF Model:</label>
-                <select id="modelSelector">
-                    <option value="tinyllama">TinyLlama 1.1B (Q3_K_S)</option>
-                    <option value="stablelm-zephyr-3b">StableLM Zephyr 3B (Q3_K_S)</option>
-                </select>
-            </section>
-            
-            <section id="story-management">
-                <h3>🗂️ Story Management</h3>
-                <label for="storyListCreator">Current Active Story:</label>
-                <select id="storyListCreator"></select>
-                <div class="button-group">
-                    <button id="newStoryBtn" class="secondary">➕ New Story</button>
-                    <button id="saveBtn" class="secondary">💾 Save Content</button>
-                    <button id="deleteStoryBtn" class="danger">🗑 Delete Story</button>
-                </div>
-            </section>
+        <!-- ======================= -->
+        <!-- ===== CREATOR TAB ===== -->
+        <!-- ======================= -->
+        <div id="creator-tab" class="tab-content">
+            <div class="creator-layout">
+                <!-- === Creator Sidebar === -->
+                <aside class="creator-sidebar">
+                    <h2>Backend Status</h2>
+                    <div style="display: flex; align-items: center; margin-bottom: 1rem;">
+                        <span id="status-light" class="status-light"></span>
+                        <span id="status-text">Disconnected</span>
+                    </div>
+                    <button id="connect-btn" class="btn-primary" style="width: 100%;">Connect to Backend</button>
 
-            <section id="story-editor">
-                <h2 id="storyTitle">No Story Selected</h2>
-                
-                <label for="storyContext">Full Story Context:</label>
-                <textarea id="storyContext" placeholder="Create or select a story. Its content will appear here..."></textarea>
-                
-                <label for="instruction">Generation Instruction:</label>
-                <textarea id="instruction" placeholder="e.g., Write the next chapter.&#10;e.g., Rewrite the last paragraph to be more exciting.&#10;e.g., Add a description of the main character's doubts."></textarea>
-                
-                <button id="generateBtn" class="primary" style="width: 100%; padding: 15px; font-size: 1.1rem;">
-                    ✨ Generate
-                </button>
-                
-                <h3>🤖 Generated Text:</h3>
-                <pre id="response"></pre>
-                <button id="appendBtn" class="secondary">⬇️ Append to Story</button>
-            </section>
+                    <h2 style="margin-top: 2rem;">Creation Manager</h2>
+                    <div class="button-group" style="flex-direction: column; gap: 0.75rem;">
+                        <button id="new-story-btn" class="btn-primary">Create New Story</button>
+                        <button id="import-btn" class="btn-secondary">Import Creations (.json)</button>
+                        <button id="export-btn" class="btn-secondary">Export Creations (.json)</button>
+                    </div>
+
+                    <div class="story-tree-container">
+                        <h3>Your Creations Navigator</h3>
+                        <div id="story-tree" class="story-tree">
+                            <p>No story selected.</p>
+                        </div>
+                    </div>
+                </aside>
+
+                <!-- === Creator Main Panel === -->
+                <main class="creator-main">
+                    <h2 id="editor-node-title">Select a Chapter to Edit</h2>
+                    <div class="button-group" style="margin-bottom: 1.5rem;">
+                        <button id="save-node-btn" class="btn-primary" disabled>💾 Save Chapter</button>
+                        <button id="delete-node-btn" class="btn-secondary" disabled>🗑️ Delete Chapter</button>
+                    </div>
+
+                    <label for="node-title-input">Chapter Title:</label>
+                    <input type="text" id="node-title-input" placeholder="e.g., Chapter 1: The Beginning" disabled>
+                    
+                    <label for="node-content-textarea">Chapter Content:</label>
+                    <textarea id="node-content-textarea" rows="10" placeholder="Write your story here..." disabled></textarea>
+
+                    <h3>Story Choices (Branches)</h3>
+                    <div id="node-choices-editor">
+                        <!-- Choice editor fields go here -->
+                    </div>
+                    <button id="add-choice-btn" class="btn-secondary" disabled>Add New Choice</button>
+
+                    <!-- AI Panel -->
+                    <fieldset id="ai-controls" disabled style="margin-top: 2rem;">
+                        <legend>AI Assistant</legend>
+                        
+                        <label for="model-select">Model:</label>
+                        <select id="model-select">
+                            <option value="">-- Disconnected --</option>
+                        </select>
+                        
+                        <label for="ai-instruction">Prompt / Instruction:</label>
+                        <textarea id="ai-instruction" rows="3" placeholder="e.g., 'Write a tense scene where the hero finds a mysterious amulet.' or 'Make the current chapter longer.'"></textarea>
+
+                        <div class="button-group">
+                            <button id="ai-generate-content-btn" class="btn-primary">Generate Chapter Content</button>
+                            <button id="ai-generate-choices-btn" class="btn-secondary">Suggest 3 Choices</button>
+                        </div>
+                    </fieldset>
+                </main>
+            </div>
         </div>
     </main>
-
-    <footer>
-        Built by <b>FugthChat</b> • Powered by
-        <a href="https://huggingface.co/" target="_blank">Hugging Face</a>
-    </footer>
-
-<script>
-// --- DOM Elements ---
-const navReader = document.getElementById('navReader');
-const navCreator = document.getElementById('navCreator');
-const readerTab = document.getElementById('readerTab');
-const creatorTab = document.getElementById('creatorTab');
-
-const storyListReader = document.getElementById('storyListReader');
-const storyDisplay = document.getElementById('storyDisplay');
-
-const apiUrlInput = document.getElementById('apiUrl');
-const pingBtn = document.getElementById('pingBtn');
-const statusBtn = document.getElementById('statusBtn');
-const modelSelector = document.getElementById('modelSelector');
-const storyListCreator = document.getElementById('storyListCreator');
-const newStoryBtn = document.getElementById('newStoryBtn');
-const deleteStoryBtn = document.getElementById('deleteStoryBtn');
-const saveBtn = document.getElementById('saveBtn');
-const storyTitle = document.getElementById('storyTitle');
-const storyContext = document.getElementById('storyContext');
-const instruction = document.getElementById('instruction');
-const generateBtn = document.getElementById('generateBtn');
-const responseDiv = document.getElementById('response');
-const appendBtn = document.getElementById('appendBtn');
-
-// --- App State ---
-let stories = JSON.parse(localStorage.getItem("stories") || "{}");
-let currentStory = null;
-let isGenerating = false;
-
-// --- Model Definitions ---
-const GGUF_MODELS = {
-    "tinyllama": {
-        repo: "TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF",
-        file: "tinyllama-1.1b-chat-v1.0.Q3_K_S.gguf",
-        chat_format: "zephyr"
-    },
-    "stablelm-zephyr-3b": {
-        repo: "TheBloke/stablelm-zephyr-3b-GGUF",
-        file: "stablelm-zephyr-3b.Q3_K_S.gguf",
-        chat_format: "zephyr"
-    }
-};
-
-// --- Tab Navigation ---
-navReader.onclick = () => {
-    navReader.classList.add('active');
-    navCreator.classList.remove('active');
-    readerTab.classList.add('active');
-    creatorTab.classList.remove('active');
-    updateStoryList(); // Refresh reader list
-};
-navCreator.onclick = () => {
-    navCreator.classList.add('active');
-    navReader.classList.remove('active');
-    creatorTab.classList.add('active');
-    readerTab.classList.remove('active');
-    updateStoryList(); // Refresh creator list
-};
-
-// --- API & Status ---
-function setStatus(color, title) {
-    statusBtn.style.background = color;
-    pingBtn.title = title;
-}
-
-async function checkConnection() {
-    const API_URL = apiUrlInput.value.trim();
-    if (!API_URL) {
-        setStatus("red", "API URL is empty");
-        return false;
-    }
     
-    setStatus("yellow", "Connecting...");
-    generateBtn.disabled = true;
-    try {
-        const res = await fetch(API_URL + "/", { method: "GET" });
-        if (res.ok) {
-            setStatus("limegreen", "Connected to backend");
-            generateBtn.disabled = isGenerating; // Only enable if not already generating
-            return true;
-        } else {
-            throw new Error("Bad response");
-        }
-    } catch (e) {
-        setStatus("red", "Not connected");
-        generateBtn.disabled = true;
-        return false;
-    }
-}
-pingBtn.onclick = checkConnection;
+    <!-- ======================= -->
+    <!-- === READER MODAL ====== -->
+    <!-- ======================= -->
+    <div id="reader-view" class="reader-view" style="display: none;">
+        <header class="reader-header">
+            <h2 id="reader-title" class="reader-title">Story Title</h2>
+            <button id="reader-close-btn" class="btn-secondary">Close Reader</button>
+        </header>
 
-// --- Story Management ---
-function updateStoryList() {
-    // Clear both lists
-    storyListReader.innerHTML = '<option value="">-- Select a story --</option>';
-    storyListCreator.innerHTML = '<option value="">-- Select a story --</option>';
-    
-    for (let title in stories) {
-        const optReader = document.createElement("option");
-        optReader.value = title;
-        optReader.textContent = title;
-        storyListReader.appendChild(optReader);
-        
-        const optCreator = document.createElement("option");
-        optCreator.value = title;
-        optCreator.textContent = title;
-        storyListCreator.appendChild(optCreator);
-    }
-    
-    // Reselect current story in both
-    if (currentStory) {
-        storyListReader.value = currentStory;
-        storyListCreator.value = currentStory;
-    }
-}
+        <div class="reader-content-wrapper">
+            <!-- TTS Player -->
+            <div class="tts-player">
+                <div class="tts-controls-main">
+                    <button id="tts-play" class="btn-primary">▶️</button>
+                    <button id="tts-pause" class="btn-secondary">⏸️</button>
+                    <button id="tts-stop" class="btn-secondary">⏹️</button>
+                    <span id="tts-status" class="tts-status">Idle</span>
+                </div>
+                <div class="tts-controls-settings">
+                    <div class="tts-setting">
+                        <label for="tts-voice-select">Voice:</label>
+                        <select id="tts-voice-select"></select>
+                    </div>
+                    <div class="tts-setting">
+                        <label for="tts-rate-slider">Speed: <span id="tts-rate-label">1x</span></label>
+                        <input type="range" id="tts-rate-slider" min="0.5" max="2" value="1" step="0.1">
+                    </div>
+                </div>
+            </div>
 
-function saveStories() {
-    localStorage.setItem("stories", JSON.stringify(stories));
-}
+            <div class="reader-breadcrumbs" id="reader-breadcrumbs">
+                <!-- Breadcrumbs go here -->
+            </div>
+            
+            <div class="reader-text" id="reader-text-content">
+                <!-- Story text goes here -->
+            </div>
 
-function loadStory(title) {
-    if (!title) {
-        currentStory = null;
-        storyTitle.textContent = "No Story Selected";
-        storyContext.value = "";
-        storyDisplay.textContent = "Select a story from the list to display its content here.";
-        return;
-    }
-    currentStory = title;
-    storyTitle.textContent = title;
-    const content = stories[currentStory]?.content || "";
-    storyContext.value = content;
-    storyDisplay.textContent = content; // Update reader tab
-    responseDiv.innerText = "";
-    instruction.value = "";
-}
+            <div class="reader-choices" id="reader-choices">
+                <h3>What happens next?</h3>
+                <!-- Choice buttons go here -->
+            </div>
+        </div>
+    </div>
 
-// --- Event Listeners ---
-storyListReader.onchange = () => loadStory(storyListReader.value);
-storyListCreator.onchange = () => loadStory(storyListCreator.value);
 
-newStoryBtn.onclick = () => {
-    const title = prompt("Enter new story title:");
-    if (!title || title.trim() === "") return;
-    if (stories[title]) {
-        alert("A story with this title already exists.");
-        return;
-    }
-    stories[title] = { content: "" };
-    saveStories();
-    loadStory(title);
-    updateStoryList();
-};
+    <!-- ======================= -->
+    <!-- ====== JAVASCRIPT ===== -->
+    <!-- ======================= -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
 
-deleteStoryBtn.onclick = () => {
-    if (!currentStory) return alert("No story selected!");
-    if (confirm(`Are you sure you want to permanently delete "${currentStory}"?`)) {
-        delete stories[currentStory];
-        saveStories();
-        loadStory(null); // Load empty state
-        updateStoryList();
-    }
-};
+            // --- STATE & CONSTANTS ---
+            const API_URL = "https://fugthchat-fugthdes.hf.space";
+            const DB_KEY = "lunarith_user_stories_v3"; // Key for user's own creations
+            
+            let featuredStories = {}; // Stories from /stories/index.json
+            let userStories = {};     // Stories from localStorage
+            
+            let currentStoryId = null;
+            let currentNodeId = null;
+            let currentStoryIsFeatured = false; // Flag to check if we can edit
+            let activeStoryData = null; // Holds the full data for the *currently open* featured story
+            
+            let isBackendConnected = false;
+            let ttsUtterance;
+            let ttsSentences = [];
+            let ttsCurrentSentenceIdx = 0;
+            const synth = window.speechSynthesis;
+            let voices = [];
+            
+            // --- SELECTORS ---
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+            const featuredStoryGrid = document.getElementById('featured-story-grid');
+            const userStoryGrid = document.getElementById('user-story-grid');
+            const readerView = document.getElementById('reader-view');
+            const readerCloseBtn = document.getElementById('reader-close-btn');
+            const readerTitle = document.getElementById('reader-title');
+            const readerBreadcrumbs = document.getElementById('reader-breadcrumbs');
+            const readerTextContent = document.getElementById('reader-text-content');
+            const readerChoices = document.getElementById('reader-choices');
+            const ttsPlayBtn = document.getElementById('tts-play');
+            const ttsPauseBtn = document.getElementById('tts-pause');
+            const ttsStopBtn = document.getElementById('tts-stop');
+            const ttsStatus = document.getElementById('tts-status');
+            const ttsVoiceSelect = document.getElementById('tts-voice-select');
+            const ttsRateSlider = document.getElementById('tts-rate-slider');
+            const ttsRateLabel = document.getElementById('tts-rate-label');
+            const connectBtn = document.getElementById('connect-btn');
+            const statusLight = document.getElementById('status-light');
+            const statusText = document.getElementById('status-text');
+            const newStoryBtn = document.getElementById('new-story-btn');
+            const importBtn = document.getElementById('import-btn');
+            const exportBtn = document.getElementById('export-btn');
+            const storyTree = document.getElementById('story-tree');
+            const editorNodeTitle = document.getElementById('editor-node-title');
+            const nodeTitleInput = document.getElementById('node-title-input');
+            const nodeContentTextarea = document.getElementById('node-content-textarea');
+            const nodeChoicesEditor = document.getElementById('node-choices-editor');
+            const addChoiceBtn = document.getElementById('add-choice-btn');
+            const saveNodeBtn = document.getElementById('save-node-btn');
+            const deleteNodeBtn = document.getElementById('delete-node-btn');
+            const aiControls = document.getElementById('ai-controls');
+            const modelSelect = document.getElementById('model-select');
+            const aiInstruction = document.getElementById('ai-instruction');
+            const aiGenerateContentBtn = document.getElementById('ai-generate-content-btn');
+            const aiGenerateChoicesBtn = document.getElementById('ai-generate-choices-btn');
 
-saveBtn.onclick = () => {
-    if (!currentStory) return alert("Create or select a story first.");
-    stories[currentStory].content = storyContext.value;
-    saveStories();
-    // Re-load to update reader tab
-    loadStory(currentStory);
-    alert("✅ Story saved!");
-};
+            
+            // --- CORE DATA FUNCTIONS ---
+            
+            function loadUserStories() {
+                try {
+                    const data = localStorage.getItem(DB_KEY);
+                    userStories = data ? JSON.parse(data) : {};
+                } catch (e) { console.error("Error loading user stories:", e); userStories = {}; }
+            }
+            
+            function saveUserStories() {
+                try {
+                    localStorage.setItem(DB_KEY, JSON.stringify(userStories));
+                } catch (e) { console.error("Error saving user stories:", e); alert("Error: Could not save data."); }
+            }
+            
+            /** This is the NEW function to load from your stories/ folder */
+            async function loadFeaturedStories() {
+                try {
+                    const response = await fetch('stories/index.json');
+                    if (!response.ok) throw new Error('Failed to load stories/index.json. Create this file.');
+                    const index = await response.json();
+                    
+                    // Convert array to object for easier lookup
+                    featuredStories = index.reduce((acc, story) => {
+                        acc[story.id] = story;
+                        return acc;
+                    }, {});
+                } catch (e) {
+                    console.error("No featured stories found:", e.message);
+                    featuredStories = {};
+                }
+            }
 
-appendBtn.onclick = () => {
-    const newText = responseDiv.innerText.trim();
-    if (newText) {
-        storyContext.value += "\n\n" + newText;
-        responseDiv.innerText = ""; // Clear response box
-    }
-};
+            function generateId(prefix = 'node') {
+                return `${prefix}_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+            }
 
-// --- AI Generation ---
-generateBtn.onclick = async () => {
-    if (!currentStory) return alert("Select or create a story first!");
-    if (isGenerating) return;
+            function switchTab(e) {
+                const targetTab = e.target.dataset.tab;
+                tabButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.tab === targetTab));
+                tabContents.forEach(content => content.classList.toggle('active', content.id === targetTab));
+                
+                if (targetTab === 'reader-tab') {
+                    renderReaderLibrary();
+                } else if (targetTab === 'creator-tab') {
+                    renderCreatorList();
+                    if(currentStoryId && !currentStoryIsFeatured) renderStoryTree(currentStoryId);
+                }
+            }
+            
+            // --- BACKEND CONNECTION ---
+            
+            async function checkBackendStatus() {
+                statusLight.className = 'status-light connecting';
+                statusText.textContent = 'Connecting...';
+                connectBtn.disabled = true;
+                aiControls.disabled = true;
+                modelSelect.innerHTML = '<option value="">-- Connecting... --</option>';
+                
+                try {
+                    const response = await fetch(API_URL + "/");
+                    if (!response.ok) throw new Error(`Server error: ${response.status}`);
+                    
+                    const data = await response.json();
+                    if (!data.status || data.status !== "AI server is online") {
+                        throw new Error("Backend reported it is not ready.");
+                    }
+                    
+                    statusLight.className = 'status-light connected';
+                    statusText.textContent = `Connected (${data.model_loaded})`;
+                    isBackendConnected = true;
+                    if(currentStoryId && !currentStoryIsFeatured) {
+                        aiControls.disabled = false;
+                    }
+                    
+                    // Populate model selector
+                    modelSelect.innerHTML = ''; // Clear
+                    if (data.models && data.models.length > 0) {
+                        data.models.forEach(modelName => {
+                            const option = document.createElement('option');
+                            option.value = modelName;
+                            option.textContent = modelName.charAt(0).toUpperCase() + modelName.slice(1);
+                            modelSelect.appendChild(option);
+                        });
+                    } else {
+                        modelSelect.innerHTML = '<option value="default">Default Model</option>';
+                    }
+                    
+                } catch (err) {
+                    console.error("Backend connection failed:", err);
+                    statusLight.className = 'status-light error';
+                    statusText.textContent = 'Connection Failed';
+                    isBackendConnected = false;
+                    aiControls.disabled = true;
+                    modelSelect.innerHTML = '<option value="">-- Disconnected --</option>';
+                } finally {
+                    connectBtn.disabled = false;
+                }
+            }
 
-    const API_URL = apiUrlInput.value.trim();
-    const context = storyContext.value.trim();
-    const instruct = instruction.value.trim();
-    
-    if (!instruct) return alert("Please provide an instruction.");
-    
-    responseDiv.innerText = "⏳ Connecting to AI...";
-    isGenerating = true;
-    generateBtn.disabled = true;
-    generateBtn.textContent = "Generating...";
+            // --- READER TAB & VIEW ---
+            
+            function renderReaderLibrary() {
+                // Render Featured Stories
+                featuredStoryGrid.innerHTML = '';
+                const featuredStoryIds = Object.keys(featuredStories);
+                if (featuredStoryIds.length === 0) {
+                    featuredStoryGrid.innerHTML = `<p style="color: var(--text-secondary);">No featured stories found. (Check 'stories/index.json')</p>`;
+                } else {
+                    featuredStoryIds.forEach(storyId => {
+                        const story = featuredStories[storyId];
+                        const card = createStoryCard(storyId, story, true);
+                        featuredStoryGrid.appendChild(card);
+                    });
+                }
+                
+                // Render User Stories
+                userStoryGrid.innerHTML = '';
+                const userStoryIds = Object.keys(userStories);
+                if (userStoryIds.length === 0) {
+                    userStoryGrid.innerHTML = `<p style="color: var(--text-secondary);">You haven't created any stories yet. Go to the "Creator" tab to start.</p>`;
+                } else {
+                    userStoryIds.forEach(storyId => {
+                        const story = userStories[storyId];
+                        const card = createStoryCard(storyId, story, false);
+                        userStoryGrid.appendChild(card);
+                    });
+                }
+            }
+            
+            function createStoryCard(storyId, story, isFeatured) {
+                const card = document.createElement('div');
+                card.className = 'story-card';
+                card.innerHTML = `
+                    <img class="story-card-cover" src="${story.cover || 'https://placehold.co/300x450/0F0F0F/FF4500?text=' + encodeURIComponent(story.title)}" alt="Cover for ${story.title}">
+                    <div class="story-card-content">
+                        <h3 class="story-card-title">${story.title}</h3>
+                        <p class="story-card-author">by ${story.author || 'Unknown'}</p>
+                    </div>
+                `;
+                card.addEventListener('click', () => openReader(storyId, 'root', isFeatured));
+                return card;
+            }
+            
+            async function openReader(storyId, nodeId, isFeatured) {
+                stopTTS();
+                
+                let storyData;
+                if (isFeatured) {
+                    // Featured story: fetch its full JSON from the stories/ folder
+                    try {
+                        const path = featuredStories[storyId].path;
+                        if (!path) throw new Error("Story path not defined in index.json");
+                        
+                        const response = await fetch(path);
+                        if (!response.ok) throw new Error(`Could not fetch story file: ${path}`);
+                        storyData = await response.json();
+                        activeStoryData = storyData; // Cache the full story data
+                    } catch (e) {
+                        console.error(e);
+                        alert("Error: Could not load featured story data.");
+                        return;
+                    }
+                } else {
+                    // User story: load from local state
+                    storyData = userStories[storyId];
+                    activeStoryData = storyData;
+                }
+                
+                currentStoryId = storyId;
+                currentNodeId = nodeId;
+                currentStoryIsFeatured = isFeatured;
+                
+                renderReaderNode(nodeId);
+                readerView.style.display = 'flex';
+            }
+            
+            function closeReader() {
+                stopTTS();
+                readerView.style.display = 'none';
+                activeStoryData = null; // Clear cached story data
+            }
+            
+            function getBreadcrumbPath(nodeId) {
+                if (!activeStoryData) return [];
+                let path = [];
+                let currentId = nodeId;
 
-    const connected = await checkConnection();
-    if (!connected) {
-        responseDiv.innerText = "❌ Could not connect to backend.";
-        isGenerating = false;
-        generateBtn.textContent = "✨ Generate";
-        return;
-    }
-    
-    responseDiv.innerText = "✨ Sending prompt to model... This may take a few minutes.";
+                while (currentId) {
+                    const node = activeStoryData.nodes[currentId];
+                    if (!node) break;
+                    path.unshift({ id: currentId, title: node.title });
+                    
+                    const parentId = Object.keys(activeStoryData.nodes).find(id => 
+                        activeStoryData.nodes[id].choices.some(c => c.targetNodeId === currentId)
+                    );
+                    currentId = parentId;
+                }
+                if (path.length > 0 && path[0].id !== 'root') {
+                    const rootNode = activeStoryData.nodes['root'];
+                    if (rootNode) path.unshift({ id: 'root', title: rootNode.title });
+                }
+                return path;
+            }
 
-    // Get selected model info
-    const modelKey = modelSelector.value;
-    const model = GGUF_MODELS[modelKey];
+            function renderReaderNode(nodeId) {
+                if (!activeStoryData) return;
+                
+                const node = activeStoryData.nodes[nodeId];
+                if (!node) { console.error("Node not found:", nodeId); return; }
+                
+                currentNodeId = nodeId;
+                readerTitle.textContent = activeStoryData.title;
+                
+                // Render Breadcrumbs
+                readerBreadcrumbs.innerHTML = '';
+                const path = getBreadcrumbPath(nodeId);
+                path.forEach((step, index) => {
+                    const span = document.createElement('span');
+                    span.textContent = step.title;
+                    if (index < path.length - 1) {
+                        span.style.cursor = 'pointer';
+                        span.onclick = () => renderReaderNode(step.id);
+                        readerBreadcrumbs.appendChild(span);
+                        readerBreadcrumbs.append(' / ');
+                    } else {
+                        readerBreadcrumbs.appendChild(span);
+                    }
+                });
+                
+                // Prepare content for TTS & display
+                const content = node.content || "This chapter is empty.";
+                const paragraphs = content.split('\n');
+                readerTextContent.innerHTML = '';
+                ttsSentences = [];
+                
+                paragraphs.forEach(p_text => {
+                    const p = document.createElement('p');
+                    if (p_text.trim() === '') {
+                        p.innerHTML = '&nbsp;';
+                    } else {
+                        const sentences = p_text.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [p_text];
+                        sentences.forEach(s_text => {
+                            const span = document.createElement('span');
+                            span.textContent = s_text.trim() + ' ';
+                            span.id = `tts-span-${ttsSentences.length}`;
+                            p.appendChild(span);
+                            ttsSentences.push(s_text.trim());
+                        });
+                    }
+                    readerTextContent.appendChild(p);
+                });
 
-    // --- Prompt Engineering ---
-    // Format the prompt according to the model's chat format
-    let fullPrompt = "";
-    if (model.chat_format === "zephyr") {
-        fullPrompt = `<|user|>\nHere is the story so far:\n${context}\n\nMy instruction is:\n${instruct}\n\nPlease continue the story based on my instruction.<|endoftext|>\n<|assistant|>`;
-    } else {
-        // Default simple prompt
-        fullPrompt = `Story:\n${context}\n\nInstruction:\n${instruct}\n\nResponse:`;
-    }
+                // Render Choices
+                readerChoices.innerHTML = '<h3>What happens next?</h3>';
+                if (node.choices && node.choices.length > 0) {
+                    node.choices.forEach(choice => {
+                        const btn = document.createElement('button');
+                        btn.className = 'btn-secondary choice-btn';
+                        btn.textContent = choice.text;
+                        btn.onclick = () => renderReaderNode(choice.targetNodeId);
+                        readerChoices.appendChild(btn);
+                    });
+                } else {
+                    readerChoices.innerHTML += `<p><i>You've reached an ending.</i></p>`;
+                }
+            }
 
-    try {
-        const res = await fetch(API_URL + "/generate", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                // Send the model info and the formatted prompt
-                model_repo: model.repo,
-                model_file: model.file,
-                prompt: fullPrompt,
-                max_tokens: 512 // You can make this an input field later
-            })
+            // --- TEXT-TO-SPEECH (TTS) ---
+            
+            function initTTS() {
+                function populateVoices() {
+                    voices = synth.getVoices().filter(v => v.lang.startsWith('en'));
+                    ttsVoiceSelect.innerHTML = '';
+                    voices.forEach(voice => {
+                        const option = document.createElement('option');
+                        option.textContent = `${voice.name} (${voice.lang})`;
+                        option.setAttribute('data-name', voice.name);
+                        ttsVoiceSelect.appendChild(option);
+                    });
+                }
+                populateVoices();
+                if (synth.onvoiceschanged !== undefined) {
+                    synth.onvoiceschanged = populateVoices;
+                }
+                
+                ttsPlayBtn.onclick = playTTS;
+                ttsPauseBtn.onclick = pauseTTS;
+                ttsStopBtn.onclick = stopTTS;
+                ttsRateSlider.oninput = () => {
+                    const rate = parseFloat(ttsRateSlider.value).toFixed(1);
+                    ttsRateLabel.textContent = `${rate}x`;
+                    if (synth.speaking && !synth.paused) { stopTTS(); playTTS(); }
+                };
+            }
+
+            function playTTS() {
+                if (synth.paused) { synth.resume(); ttsStatus.textContent = 'Speaking...'; return; }
+                if (synth.speaking) return;
+                ttsCurrentSentenceIdx = 0;
+                speakNextSentence();
+            }
+
+            function speakNextSentence() {
+                if (ttsCurrentSentenceIdx >= ttsSentences.length) { stopTTS(); return; }
+                
+                document.querySelectorAll('.tts-highlight').forEach(el => el.classList.remove('tts-highlight'));
+                const text = ttsSentences[ttsCurrentSentenceIdx];
+                if (!text) { ttsCurrentSentenceIdx++; speakNextSentence(); return; }
+
+                ttsUtterance = new SpeechSynthesisUtterance(text);
+                
+                const selectedVoiceName = ttsVoiceSelect.selectedOptions[0]?.getAttribute('data-name');
+                if (selectedVoiceName) {
+                    ttsUtterance.voice = voices.find(v => v.name === selectedVoiceName);
+                }
+                ttsUtterance.rate = parseFloat(ttsRateSlider.value);
+                
+                const span = document.getElementById(`tts-span-${ttsCurrentSentenceIdx}`);
+                if (span) {
+                    span.classList.add('tts-highlight');
+                    span.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+
+                ttsUtterance.onend = () => {
+                    if (span) span.classList.remove('tts-highlight');
+                    ttsCurrentSentenceIdx++;
+                    speakNextSentence();
+                };
+                ttsUtterance.onerror = (e) => console.error("TTS Error:", e);
+                
+                synth.speak(ttsUtterance);
+                ttsStatus.textContent = 'Speaking...';
+            }
+            
+            function pauseTTS() {
+                if (synth.speaking) { synth.pause(); ttsStatus.textContent = 'Paused'; }
+            }
+            
+            function stopTTS() {
+                synth.cancel();
+                ttsCurrentSentenceIdx = 0;
+                ttsStatus.textContent = 'Idle';
+                document.querySelectorAll('.tts-highlight').forEach(el => el.classList.remove('tts-highlight'));
+            }
+
+            // --- CREATOR TAB FUNCTIONS ---
+
+            function renderCreatorList() {
+                const storyIds = Object.keys(userStories);
+                if (storyIds.length === 0) {
+                    storyTree.innerHTML = `<p style="color: var(--text-secondary);">No stories created yet.</p>`;
+                    return;
+                }
+                
+                const ul = document.createElement('ul');
+                ul.className = 'story-tree';
+                
+                storyIds.forEach(storyId => {
+                    const story = userStories[storyId];
+                    const li = document.createElement('li');
+                    const div = document.createElement('div');
+                    div.className = 'tree-node';
+                    div.textContent = `📖 ${story.title}`;
+                    if (storyId === currentStoryId && !currentStoryIsFeatured) {
+                        div.classList.add('active');
+                    }
+                    div.onclick = () => {
+                        currentStoryId = storyId;
+                        currentNodeId = 'root';
+                        currentStoryIsFeatured = false;
+                        renderStoryTree(storyId);
+                        loadNodeInEditor(storyId, 'root');
+                        document.querySelectorAll('.story-tree > li > .tree-node').forEach(n => n.classList.remove('active'));
+                        div.classList.add('active');
+                    };
+                    li.appendChild(div);
+                    ul.appendChild(li);
+                });
+                storyTree.innerHTML = '';
+                storyTree.appendChild(ul);
+                
+                if (currentStoryId && !currentStoryIsFeatured) {
+                    renderStoryTree(currentStoryId);
+                }
+            }
+            
+            function renderStoryTree(storyId) {
+                const story = userStories[storyId];
+                if (!story) return;
+                
+                const storyNodes = storyTree.querySelectorAll('.story-tree > li > .tree-node');
+                let activeStoryLi = null;
+                storyNodes.forEach(n => {
+                    if (n.textContent === `📖 ${story.title}`) {
+                        activeStoryLi = n.parentElement;
+                        n.classList.add('active');
+                    } else { n.classList.remove('active'); }
+                });
+
+                if (!activeStoryLi) return;
+                
+                const oldTree = activeStoryLi.querySelector('ul');
+                if (oldTree) oldTree.remove();
+                
+                const ul = document.createElement('ul');
+                function buildTreeHtml(nodeId) {
+                    const node = story.nodes[nodeId];
+                    if (!node) return;
+                    
+                    const li = document.createElement('li');
+                    const div = document.createElement('div');
+                    div.className = 'tree-node';
+                    div.textContent = node.title || "Untitled Chapter";
+                    div.dataset.nodeId = nodeId;
+                    if (nodeId === currentNodeId) { div.classList.add('active'); }
+                    
+                    div.onclick = (e) => { e.stopPropagation(); loadNodeInEditor(storyId, nodeId); };
+                    li.appendChild(div);
+                    
+                    if (node.choices && node.choices.length > 0) {
+                        const nestedUl = document.createElement('ul');
+                        node.choices.forEach(choice => {
+                            if (userStories[storyId].nodes[choice.targetNodeId]) {
+                                nestedUl.appendChild(buildTreeHtml(choice.targetNodeId));
+                            }
+                        });
+                        li.appendChild(nestedUl);
+                    }
+                    return li;
+                }
+                ul.appendChild(buildTreeHtml('root'));
+                activeStoryLi.appendChild(ul);
+            }
+            
+            function createNewStory() {
+                const title = prompt("Enter a title for your new story:", "My New Story");
+                if (!title) return;
+                const author = "Me";
+                
+                const storyId = generateId('story');
+                userStories[storyId] = {
+                    title,
+                    author,
+                    cover: `https://placehold.co/300x450/${Math.floor(Math.random()*16777215).toString(16)}/FFFFFF?text=${encodeURIComponent(title)}`,
+                    nodes: {
+                        "root": { title: "Chapter 1: The Beginning", content: "Once upon a time...", choices: [] }
+                    }
+                };
+                
+                saveUserStories();
+                currentStoryId = storyId;
+                currentNodeId = 'root';
+                currentStoryIsFeatured = false;
+                renderCreatorList();
+                loadNodeInEditor(storyId, 'root');
+            }
+            
+            function setEditorDisabled(disabled) {
+                editorNodeTitle.textContent = disabled ? "Select a Creation to Edit" : editorNodeTitle.textContent;
+                nodeTitleInput.disabled = disabled;
+                nodeContentTextarea.disabled = disabled;
+                addChoiceBtn.disabled = disabled;
+                saveNodeBtn.disabled = disabled;
+                deleteNodeBtn.disabled = disabled;
+                if(isBackendConnected) { aiControls.disabled = disabled; }
+                if (disabled) {
+                     nodeTitleInput.value = "";
+                     nodeContentTextarea.value = "";
+                     nodeChoicesEditor.innerHTML = "";
+                }
+            }
+
+            function loadNodeInEditor(storyId, nodeId) {
+                if (!storyId || !userStories[storyId]) {
+                    setEditorDisabled(true);
+                    return;
+                }
+                
+                setEditorDisabled(false);
+                currentStoryId = storyId;
+                currentNodeId = nodeId;
+                currentStoryIsFeatured = false;
+                
+                const node = userStories[storyId].nodes[nodeId];
+                if (!node) return;
+                
+                editorNodeTitle.textContent = `Editing: ${node.title}`;
+                nodeTitleInput.value = node.title;
+                nodeContentTextarea.value = node.content;
+                
+                document.querySelectorAll('.story-tree .tree-node.active').forEach(n => n.classList.remove('active'));
+                const treeNode = document.querySelector(`.tree-node[data-node-id="${nodeId}"]`);
+                if (treeNode) treeNode.classList.add('active');
+                
+                renderNodeChoicesEditor(storyId, nodeId);
+                deleteNodeBtn.disabled = (nodeId === 'root');
+            }
+            
+            function saveNode() {
+                if (!currentStoryId || !currentNodeId || currentStoryIsFeatured) {
+                    alert("Cannot save. No user story chapter is selected."); return;
+                }
+                
+                const story = userStories[currentStoryId];
+                const node = story.nodes[currentNodeId];
+                
+                node.title = nodeTitleInput.value || "Untitled Chapter";
+                node.content = nodeContentTextarea.value;
+                
+                const choiceInputs = nodeChoicesEditor.querySelectorAll('.choice-editor-item input');
+                node.choices = node.choices.map((choice, index) => ({
+                    ...choice,
+                    text: choiceInputs[index].value || "..."
+                }));
+                
+                saveUserStories();
+                editorNodeTitle.textContent = `Editing: ${node.title}`;
+                renderStoryTree(currentStoryId);
+            }
+            
+            function renderNodeChoicesEditor(storyId, nodeId) {
+                const node = userStories[storyId].nodes[nodeId];
+                nodeChoicesEditor.innerHTML = '';
+                
+                if (!node.choices || node.choices.length === 0) {
+                    nodeChoicesEditor.innerHTML = `<p style="color: var(--text-secondary);">No choices for this chapter yet.</p>`;
+                    return;
+                }
+                
+                node.choices.forEach((choice, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'choice-editor-item';
+                    
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.value = choice.text;
+                    input.placeholder = `Choice ${index + 1} text...`;
+                    
+                    const gotoBtn = document.createElement('button');
+                    gotoBtn.className = 'btn-secondary';
+                    gotoBtn.textContent = 'Edit ➔';
+                    gotoBtn.title = `Go to chapter: ${userStories[storyId].nodes[choice.targetNodeId]?.title}`;
+                    gotoBtn.onclick = () => loadNodeInEditor(storyId, choice.targetNodeId);
+                    
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'btn-secondary';
+                    deleteBtn.textContent = 'X';
+                    deleteBtn.title = 'Remove this choice and delete its branch';
+                    deleteBtn.onclick = () => deleteChoiceAndBranch(storyId, nodeId, choice.targetNodeId);
+                    
+                    div.appendChild(input);
+                    div.appendChild(gotoBtn);
+                    div.appendChild(deleteBtn);
+                    nodeChoicesEditor.appendChild(div);
+                });
+            }
+            
+            function addNewChoice() {
+                if (!currentStoryId || !currentNodeId || currentStoryIsFeatured) {
+                    alert("Please select a user story chapter first."); return;
+                }
+                
+                const choiceText = prompt("Enter the text for this new choice:", "...");
+                if (!choiceText) return;
+                
+                const story = userStories[currentStoryId];
+                const newNodeId = generateId();
+                story.nodes[newNodeId] = { title: choiceText, content: "", choices: [] };
+                story.nodes[currentNodeId].choices.push({
+                    text: choiceText,
+                    targetNodeId: newNodeId
+                });
+                
+                saveUserStories();
+                renderStoryTree(currentStoryId);
+                renderNodeChoicesEditor(currentStoryId, currentNodeId);
+            }
+            
+            function deleteChoiceAndBranch(storyId, parentNodeId, targetNodeId) {
+                if (targetNodeId === 'root') return;
+                if (!confirm("Are you sure? This will delete this choice and ALL chapters that follow it.")) return;
+                
+                const story = userStories[storyId];
+                const parentNode = story.nodes[parentNodeId];
+                parentNode.choices = parentNode.choices.filter(c => c.targetNodeId !== targetNodeId);
+                
+                const nodesToDelete = [targetNodeId];
+                let i = 0;
+                while (i < nodesToDelete.length) {
+                    const nodeId = nodesToDelete[i];
+                    const node = story.nodes[nodeId];
+                    if (node && node.choices) {
+                        node.choices.forEach(c => nodesToDelete.push(c.targetNodeId));
+                    }
+                    delete story.nodes[nodeId];
+                    i++;
+                }
+                
+                saveUserStories();
+                renderStoryTree(storyId);
+                renderNodeChoicesEditor(storyId, parentNodeId);
+            }
+
+            function deleteCurrentNode() {
+                if (!currentStoryId || !currentNodeId || currentNodeId === 'root' || currentStoryIsFeatured) {
+                    alert("Cannot delete the root chapter or a featured story node."); return;
+                }
+
+                const story = userStories[currentStoryId];
+                const parentId = Object.keys(story.nodes).find(id => 
+                    story.nodes[id].choices.some(c => c.targetNodeId === currentNodeId)
+                );
+
+                if (parentId) {
+                    deleteChoiceAndBranch(currentStoryId, parentId, currentNodeId);
+                    loadNodeInEditor(currentStoryId, parentId);
+                } else {
+                    alert("Error: Could not find parent node. Cannot delete.");
+                }
+            }
+
+            // --- AI GENERATION ---
+            
+            async function handleAiGeneration(mode) {
+                if (!isBackendConnected) { alert("Backend is not connected."); return; }
+                if (!currentStoryId || !currentNodeId || currentStoryIsFeatured) {
+                    alert("Please select one of *your* story chapters to edit."); return;
+                }
+                
+                const story = userStories[currentStoryId];
+                const node = story.nodes[currentNodeId];
+                const instruction = aiInstruction.value;
+                const model = modelSelect.value;
+                
+                let story_memory = "";
+                const path = getBreadcrumbPath(node.id); // This needs to use the correct data
+                path.slice(0, -1).forEach(step => {
+                    const parentNode = story.nodes[step.id];
+                    if (parentNode) {
+                        story_memory += `Chapter: ${parentNode.title}\n${parentNode.content}\n\n`;
+                    }
+                });
+                
+                let prompt, finalAiPrompt;
+                if (mode === 'generate_content') {
+                    prompt = node.content;
+                    finalAiPrompt = `Here is the story so far:\n${story_memory}\n\nMy instruction is: ${instruction}\n\nGenerate the *full text* for the chapter titled "${node.title}":`;
+                    aiGenerateContentBtn.disabled = true;
+                    aiGenerateContentBtn.textContent = 'Generating...';
+                } else { // generate_choices
+                    prompt = node.content;
+                    finalAiPrompt = `The following is a chapter from a story:\n\n${prompt}\n\nBased on this text, generate exactly 3 short, distinct, and interesting choices for what the character could do next. Format them as a simple list, one per line. For example:\n- Go into the cave.\n- Check the old map.\n- Wait until nightfall.`
+                    aiGenerateChoicesBtn.disabled = true;
+                    aiGenerateChoicesBtn.textContent = 'Generating...';
+                }
+                
+                try {
+                    const response = await fetch(API_URL + "/generate", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            prompt: finalAiPrompt,
+                            feedback: "",
+                            story_memory: story_memory,
+                            model_choice: model
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    if (response.status !== 200) throw new Error(data.error || "Unknown server error");
+                    
+                    if (mode === 'generate_content') {
+                        nodeContentTextarea.value = data.story_text;
+                        saveNode(); // Auto-save
+                    } else {
+                        const choices = data.story_text.split('\n').map(c => c.trim().replace(/^- /g, '')).filter(c => c.length > 0);
+                        if(confirm(`Add these generated choices?\n\n${choices.join('\n')}`)) {
+                            choices.forEach(choiceText => {
+                                const newNodeId = generateId();
+                                story.nodes[newNodeId] = { title: choiceText, content: "", choices: [] };
+                                node.choices.push({ text: choiceText, targetNodeId: newNodeId });
+                            });
+                            saveUserStories();
+                            renderStoryTree(currentStoryId);
+                            renderNodeChoicesEditor(currentStoryId, currentNodeId);
+                        }
+                    }
+                    
+                } catch (err) {
+                    console.error("AI Generation Error:", err);
+                    alert(`An error occurred: ${err.message}`);
+                } finally {
+                    aiGenerateContentBtn.disabled = false;
+                    aiGenerateContentBtn.textContent = 'Generate Chapter Content';
+                    aiGenerateChoicesBtn.disabled = false;
+                    aiGenerateChoicesBtn.textContent = 'Suggest 3 Choices';
+                }
+            }
+            
+            // --- DATA IMPORT/EXPORT (for user creations only) ---
+            
+            function exportData() {
+                if (Object.keys(userStories).length === 0) {
+                    alert("You have no creations to export.");
+                    return;
+                }
+                if (!confirm("This will export your *local creations* library as a single JSON file. Continue?")) return;
+                try {
+                    const data = JSON.stringify(userStories, null, 2);
+                    const blob = new Blob([data], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'lunarith_creations_backup.json';
+                    a.click();
+                    URL.revokeObjectURL(url);
+                } catch (err) { alert("Error exporting data: " + err.message); }
+            }
+            
+            function importData() {
+                if (!confirm("WARNING: This will *replace* all your local creations with the data from the file. Are you sure?")) return;
+                
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = '.json,application/json';
+                input.onchange = (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        try {
+                            const data = JSON.parse(event.target.result);
+                            if (typeof data !== 'object' || Array.isArray(data)) {
+                                throw new Error("Invalid file format. Must be an object of stories.");
+                            }
+                            userStories = data;
+                            saveUserStories();
+                            currentStoryId = null;
+                            currentNodeId = null;
+                            setEditorDisabled(true);
+Analyst
+                            renderReaderLibrary();
+                            renderCreatorList();
+                            alert("Creations library imported successfully!");
+                        } catch (err) { alert("Error importing file: " + err.message); }
+                    };
+                    reader.readAsText(file);
+                };
+                input.click();
+            }
+
+            // --- INITIALIZE ---
+            
+            async function init() {
+                tabButtons.forEach(btn => btn.addEventListener('click', switchTab));
+                connectBtn.addEventListener('click', checkBackendStatus);
+                readerCloseBtn.addEventListener('click', closeReader);
+                initTTS();
+                newStoryBtn.addEventListener('click', createNewStory);
+                importBtn.addEventListener('click', importData);
+                exportBtn.addEventListener('click', exportData);
+                saveNodeBtn.addEventListener('click', saveNode);
+                addChoiceBtn.addEventListener('click', addNewChoice);
+                deleteNodeBtn.addEventListener('click', deleteCurrentNode);
+                aiGenerateContentBtn.addEventListener('click', () => handleAiGeneration('generate_content'));
+                aiGenerateChoicesBtn.addEventListener('click', () => handleAiGeneration('generate_choices'));
+
+                loadUserStories();
+                await loadFeaturedStories(); // Wait for featured stories to load from /stories/
+                
+                renderReaderLibrary();
+                setEditorDisabled(true);
+                
+                checkBackendStatus(); // Auto-connect
+            }
+
+            init();
         });
-
-        if (!res.ok) {
-            throw new Error(`Server responded with status: ${res.status}`);
-        }
-        
-        const data = await res.json();
-        
-        if (data.error) {
-            throw new Error(data.error);
-        }
-
-        const newText = data.story_text || "⚠️ No response or empty response from model.";
-        responseDiv.innerText = newText;
-        setStatus("limegreen", "Generation complete!");
-
-    } catch (err) {
-        console.error(err);
-        setStatus("red", "Error during generation");
-        responseDiv.innerText = `❌ An error occurred: ${err.message}`;
-    } finally {
-        isGenerating = false;
-        generateBtn.disabled = false;
-        generateBtn.textContent = "✨ Generate";
-    }
-};
-
-// --- Initialize ---
-updateStoryList();
-checkConnection();
-</script>
+    </script>
 </body>
 </html>
