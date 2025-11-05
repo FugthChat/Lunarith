@@ -377,7 +377,7 @@
 
                     <div class="story-tree-container">
                         <h3>// CREATIONS_NAVIGATOR</h3>
-                        <div id="story-tree" class_name="story-tree">
+                        <div id="story-tree" class="story-tree">
                             <p>// NO_STORY_LOADED</p>
                         </div>
                     </div>
@@ -478,16 +478,19 @@
         document.addEventListener('DOMContentLoaded', () => {
 
             // --- STATE & CONSTANTS ---
+            // THIS IS YOUR HUGGING FACE SPACE URL
             const API_URL = "https://fugthchat-fugthdes.hf.space";
-            const DB_KEY = "lunarith_user_stories_v3_punk"; // Key for user's own creations
+            
+            // This is the key for your browser's local storage
+            const DB_KEY = "lunarith_user_stories_v3_punk"; 
             
             let featuredStories = {}; // Stories from /stories/index.json
             let userStories = {};     // Stories from localStorage
             
             let currentStoryId = null;
             let currentNodeId = null;
-            let currentStoryIsFeatured = false; // Flag to check if we can edit
-            let activeStoryData = null; // Holds the full data for the *currently open* featured story
+            let currentStoryIsFeatured = false; 
+            let activeStoryData = null; // Caches the JSON of the currently open featured story
             
             let isBackendConnected = false;
             let ttsUtterance;
@@ -1184,15 +1187,30 @@
                     }
                 });
                 
-                let prompt, finalAiPrompt, btnToDisable;
+                let finalAiPrompt, btnToDisable, feedback;
+                
                 if (mode === 'generate_content') {
                     btnToDisable = aiGenerateContentBtn;
-                    finalAiPrompt = `Here is the story so far:\n${story_memory}\n\nMy instruction is: ${instruction || 'Continue the story'}\n\nGenerate the *full text* for the chapter titled "${node.title}":`;
+                    // For content gen, the instruction is the *feedback*
+                    feedback = instruction || 'Continue the story';
+                    // The prompt is the *current* node's content
+                    prompt = node.content; 
                 } else { // generate_choices
                     btnToDisable = aiGenerateChoicesBtn;
-                    finalAiPrompt = `The following is a chapter from a story:\n\n${node.content}\n\nBased on this text, generate exactly 3 short, distinct, and interesting choices for what the character could do next. Format them as a simple list, one per line. For example:\n- Go into the cave.\n- Check the old map.\n- Wait until nightfall.`
+                    // For choice gen, the instruction is fixed
+                    feedback = "Generate 3 choices";
+                    // The prompt is the *current* node's content
+                    prompt = node.content; 
                 }
                 
+                // This is the key change. We now build the prompt string
+                // that the *new* app.py (the one that just passes it along) expects.
+                if (mode === 'generate_content') {
+                    finalAiPrompt = `Here is the story so far:\n${story_memory}\n\nMy instruction is: ${feedback}\n\nGenerate the *full text* for the chapter titled "${node.title}":`;
+                } else { // generate_choices
+                    finalAiPrompt = `The following is a chapter from a story:\n\n${prompt}\n\nBased on this text, generate exactly 3 short, distinct, and interesting choices for what the character could do next. Format them as a simple list, one per line. For example:\n- Go into the cave.\n- Check the old map.\n- Wait until nightfall.`
+                }
+
                 const originalBtnText = btnToDisable.textContent;
                 btnToDisable.disabled = true;
                 btnToDisable.textContent = 'GENERATING...';
@@ -1202,10 +1220,13 @@
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({
-                            prompt: finalAiPrompt,
-                            feedback: "", // Feedback is now part of the main instruction
-                            story_memory: story_memory,
-                            model_choice: model
+                            prompt: finalAiPrompt, // We send the *full* prompt
+                            model_choice: model,
+                            
+                            // These are sent to match the Pydantic model, but are not used
+                            // by the new app.py logic (it's all in finalAiPrompt)
+                            feedback: feedback, 
+                            story_memory: story_memory
                         })
                     });
                     
