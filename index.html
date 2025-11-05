@@ -3,102 +3,178 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lunarith Creator</title>
+    <title>LUNARITH.CORE</title>
+    <!-- Import new fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
     <style>
         :root {
-            --bg-primary: #0F0F0F;
-            --bg-secondary: #1A1A1A;
-            --bg-tertiary: #2C2C2C;
-            --text-primary: #EAEAEA;
-            --text-secondary: #999999;
-            --accent-primary: #FF4500; /* Bright Orange */
-            --accent-hover: #FF6A29;
-            --border-color: #333333;
-            --radius: 8px;
-            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            --shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #1a1a1f;
+            --bg-tertiary: #2a2a2f;
+            --text-primary: #e0e0e0;
+            --text-secondary: #888888;
+            --accent-pink: #f900e5;
+            --accent-cyan: #00f0ff;
+            --accent-pink-trans: rgba(249, 0, 229, 0.5);
+            --accent-cyan-trans: rgba(0, 240, 255, 0.5);
+            --border-color: var(--accent-cyan);
+            --font-heading: 'Chakra Petch', sans-serif;
+            --font-body: 'Share Tech Mono', monospace;
+            --shadow: 0 0 15px var(--accent-pink-trans);
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        html, body { height: 100%; }
+
+        /* --- Base Setup & Glitch --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            border-radius: 0 !important; /* NO ROUNDED CORNERS */
+        }
+        html, body {
+            height: 100%;
+        }
         body {
-            font-family: var(--font-family);
+            font-family: var(--font-body);
             background-color: var(--bg-primary);
             color: var(--text-primary);
             display: flex;
             flex-direction: column;
             line-height: 1.6;
+            font-size: 16px;
         }
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: var(--bg-secondary); }
-        ::-webkit-scrollbar-thumb { background-color: var(--accent-primary); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background-color: var(--accent-pink); }
+        
+        /* --- Glitch Effect for Headings --- */
+        .glitch-text, h1, h2, .logo {
+            font-family: var(--font-heading);
+            text-transform: uppercase;
+            animation: glitch-flicker 3s infinite alternate;
+        }
+        
+        @keyframes glitch-flicker {
+          0% { text-shadow: 1px 0 0 var(--accent-cyan-trans), -1px 0 0 var(--accent-pink-trans); }
+          20% { text-shadow: 1px 0 0 var(--accent-cyan-trans), -1px 0 0 var(--accent-pink-trans); }
+          21% { text-shadow: -2px 0 0 var(--accent-cyan), 2px 0 0 var(--accent-pink); }
+          22% { text-shadow: 1px 0 0 var(--accent-cyan-trans), -1px 0 0 var(--accent-pink-trans); }
+          60% { text-shadow: 1px 0 0 var(--accent-cyan-trans), -1px 0 0 var(--accent-pink-trans); }
+          61% { text-shadow: 3px 0 0 var(--accent-cyan), -3px 0 0 var(--accent-pink); opacity: 0.8; }
+          62% { text-shadow: 1px 0 0 var(--accent-cyan-trans), -1px 0 0 var(--accent-pink-trans); opacity: 1; }
+          100% { text-shadow: 1px 0 0 var(--accent-cyan-trans), -1px 0 0 var(--accent-pink-trans); }
+        }
+
+        /* --- Header & Navigation --- */
         header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1rem 2rem;
-            background-color: var(--bg-secondary);
+            padding: 1.5rem 2rem;
+            background-color: transparent;
             border-bottom: 1px solid var(--border-color);
-            box-shadow: var(--shadow);
             flex-shrink: 0;
         }
-        .logo { font-size: 1.75rem; font-weight: 700; }
-        .logo span { color: var(--accent-primary); }
+        .logo {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-shadow: 0 0 10px var(--accent-pink);
+        }
+        .logo span {
+            color: var(--accent-pink);
+        }
         .tab-buttons { display: flex; gap: 0.5rem; }
         .tab-btn {
-            font-family: var(--font-family);
-            font-size: 1rem;
-            font-weight: 600;
+            font-family: var(--font-heading);
+            font-size: 1.25rem;
             padding: 0.5rem 1.25rem;
             background: transparent;
             color: var(--text-secondary);
             border: 0;
             border-bottom: 3px solid transparent;
             cursor: pointer;
-            transition: color 0.2s, border-color 0.2s;
+            transition: color 0.2s, border-color 0.2s, text-shadow 0.2s;
         }
-        .tab-btn:hover { color: var(--text-primary); }
-        .tab-btn.active { color: var(--accent-primary); border-bottom-color: var(--accent-primary); }
+        .tab-btn:hover {
+            color: var(--text-primary);
+            text-shadow: 0 0 5px var(--accent-cyan);
+        }
+        .tab-btn.active {
+            color: var(--accent-pink);
+            border-bottom-color: var(--accent-pink);
+            text-shadow: 0 0 10px var(--accent-pink);
+        }
+        
         main { flex-grow: 1; overflow-y: auto; padding: 2rem; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
+        
         h1, h2, h3 { color: var(--text-primary); margin-bottom: 1rem; }
-        h2 { border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; }
+        h2 { border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; color: var(--accent-cyan); }
+        
         button {
-            font-family: var(--font-family);
-            font-size: 0.9rem;
-            font-weight: 600;
-            padding: 0.6rem 1rem;
-            border-radius: var(--radius);
-            border: 0;
+            font-family: var(--font-heading);
+            font-size: 1rem;
+            padding: 0.75rem 1.25rem;
+            border: 1px solid var(--accent-pink);
             cursor: pointer;
             transition: all 0.2s;
             text-transform: uppercase;
+            background-color: var(--accent-pink-trans);
+            color: var(--text-primary);
         }
-        .btn-primary { background-color: var(--accent-primary); color: #FFF; }
-        .btn-primary:hover { background-color: var(--accent-hover); box-shadow: 0 0 15px rgba(255, 69, 0, 0.5); }
-        .btn-secondary { background-color: var(--bg-tertiary); color: var(--text-primary); }
-        .btn-secondary:hover { background-color: #444; }
+        .btn-primary {
+            background-color: var(--accent-pink);
+            color: var(--bg-primary);
+            border: 1px solid var(--accent-pink);
+        }
+        .btn-primary:hover {
+            background-color: var(--accent-pink);
+            box-shadow: var(--shadow);
+            color: #fff;
+        }
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--accent-cyan);
+            border: 1px solid var(--accent-cyan);
+        }
+        .btn-secondary:hover {
+            background-color: var(--accent-cyan-trans);
+            color: var(--text-primary);
+            box-shadow: 0 0 15px var(--accent-cyan-trans);
+        }
         button:disabled {
             background-color: var(--bg-tertiary) !important;
             color: var(--text-secondary) !important;
+            border-color: var(--text-secondary) !important;
             opacity: 0.6;
             cursor: not-allowed !important;
             box-shadow: none !important;
+            text-shadow: none !important;
         }
+        
         input, textarea, select {
-            font-family: var(--font-family);
+            font-family: var(--font-body);
             width: 100%;
             padding: 0.75rem;
             margin-bottom: 1rem;
             background-color: var(--bg-secondary);
             border: 1px solid var(--border-color);
-            border-radius: var(--radius);
             color: var(--text-primary);
             font-size: 1rem;
         }
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--accent-pink);
+            box-shadow: var(--shadow);
+        }
         textarea { min-height: 150px; resize: vertical; }
-        label { display: block; font-weight: 600; margin-bottom: 0.5rem; }
+        label { display: block; font-weight: 600; margin-bottom: 0.5rem; font-family: var(--font-heading); }
         .button-group { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+        
         .story-library-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -106,18 +182,21 @@
         }
         .story-card {
             background-color: var(--bg-secondary);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
             overflow: hidden;
             transition: transform 0.2s, box-shadow 0.2s;
             cursor: pointer;
         }
-        .story-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6); }
+        .story-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 20px var(--accent-cyan-trans);
+            border-color: var(--accent-cyan);
+        }
         .story-card-cover {
             width: 100%;
             height: 320px;
             object-fit: cover;
-            border-bottom: 3px solid var(--accent-primary);
+            border-bottom: 1px solid var(--accent-pink);
         }
         .story-card-content { padding: 1rem; }
         .story-card-title {
@@ -127,10 +206,13 @@
             overflow: hidden;
             text-overflow: ellipsis;
             margin-bottom: 0.25rem;
+            font-family: var(--font-heading);
+            color: var(--accent-pink);
         }
         .story-card-author { font-size: 0.9rem; color: var(--text-secondary); }
+        
         .reader-view {
-            display: none; /* Hidden by default */
+            display: none;
             position: fixed;
             top: 0;
             left: 0;
@@ -145,12 +227,12 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1rem 2rem;
+            padding: 1.5rem 2rem;
             background-color: var(--bg-secondary);
-            box-shadow: var(--shadow);
+            border-bottom: 1px solid var(--border-color);
             flex-shrink: 0;
         }
-        .reader-title { font-size: 1.5rem; font-weight: 600; }
+        .reader-title { font-size: 1.5rem; font-weight: 600; text-shadow: 0 0 10px var(--accent-pink); }
         .reader-content-wrapper {
             flex-grow: 1;
             overflow-y: auto;
@@ -161,10 +243,10 @@
         }
         .reader-breadcrumbs { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1.5rem; }
         .reader-breadcrumbs span { cursor: pointer; }
-        .reader-breadcrumbs span:hover { color: var(--accent-primary); }
-        .reader-text { font-size: 1.15rem; line-height: 1.8; }
+        .reader-breadcrumbs span:hover { color: var(--accent-cyan); }
+        .reader-text { font-size: 1.2rem; line-height: 1.8; }
         .reader-text p { margin-bottom: 1.5rem; }
-        .reader-text .tts-highlight { background-color: var(--accent-primary); color: #FFF; transition: background-color 0.1s ease-in-out; }
+        .reader-text .tts-highlight { background-color: var(--accent-pink); color: #FFF; transition: background-color 0.1s; }
         .reader-choices { margin-top: 2rem; border-top: 1px solid var(--border-color); padding-top: 2rem; }
         .reader-choices h3 { color: var(--text-secondary); }
         .choice-btn {
@@ -176,12 +258,12 @@
             padding: 1rem;
             text-transform: none;
         }
+        
         .tts-player {
             background-color: var(--bg-secondary);
             padding: 1rem;
-            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
             margin-bottom: 2rem;
-            box-shadow: var(--shadow);
         }
         .tts-controls-main { display: flex; gap: 0.75rem; align-items: center; margin-bottom: 1rem; }
         .tts-controls-main button { font-size: 1.25rem; width: 44px; height: 44px; padding: 0; }
@@ -191,40 +273,51 @@
         .tts-setting { display: flex; flex-direction: column; }
         .tts-setting label { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.25rem; }
         .tts-setting select, .tts-setting input[type="range"] { margin: 0; padding: 0.5rem; }
+        
         .creator-layout { display: grid; grid-template-columns: 1fr; gap: 2rem; height: 100%; }
         @media (min-width: 1024px) { .creator-layout { grid-template-columns: 350px 1fr; } }
+        
         .creator-sidebar, .creator-main {
             background-color: var(--bg-secondary);
-            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
             padding: 1.5rem;
-            box-shadow: var(--shadow);
         }
         .creator-sidebar h2, .creator-main h2 { margin-top: 0; }
+        
         .status-light {
             width: 12px;
             height: 12px;
-            border-radius: 50%;
             display: inline-block;
             margin-right: 0.5rem;
             border: 1px solid #111;
             background-color: var(--text-secondary);
             transition: background-color 0.3s;
+            box-shadow: 0 0 5px var(--text-secondary);
         }
-        .status-light.connecting { background-color: #E6A23C; /* Yellow */ }
-        .status-light.connected { background-color: #67C23A; /* Green */ }
-        .status-light.error { background-color: #F56C6C; /* Red */ }
+        .status-light.connecting { background-color: #E6A23C; box-shadow: 0 0 5px #E6A23C; }
+        .status-light.connected { background-color: var(--accent-cyan); box-shadow: 0 0 5px var(--accent-cyan); }
+        .status-light.error { background-color: var(--accent-pink); box-shadow: 0 0 5px var(--accent-pink); }
         #status-text { color: var(--text-secondary); }
+        
         .story-tree-container { margin-top: 1.5rem; border-top: 1px solid var(--border-color); padding-top: 1rem; }
         .story-tree { list-style: none; padding-left: 0; }
         .story-tree ul { list-style: none; padding-left: 1.5rem; border-left: 1px dashed var(--border-color); margin-left: 0.5rem; }
-        .tree-node { padding: 0.5rem; border-radius: 6px; cursor: pointer; transition: background-color 0.2s; }
-        .tree-node:hover { background-color: var(--bg-tertiary); }
-        .tree-node.active { background-color: var(--accent-primary); color: #FFF; font-weight: 600; }
+        .tree-node { padding: 0.5rem; cursor: pointer; transition: background-color 0.2s, color 0.2s; }
+        .tree-node:hover { background-color: var(--bg-tertiary); color: var(--accent-cyan); }
+        .tree-node.active { background-color: var(--accent-pink); color: #FFF; font-weight: 700; }
+        
         .choice-editor-item { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; }
         .choice-editor-item input { flex-grow: 1; margin-bottom: 0; }
         .choice-editor-item button { flex-shrink: 0; padding: 0.5rem; font-size: 0.8rem; height: 44px; }
-        .ai-panel fieldset { border: 1px solid var(--border-color); border-radius: var(--radius); padding: 1rem; }
-        .ai-panel legend { font-size: 1.1rem; font-weight: 600; color: var(--accent-primary); padding: 0 0.5rem; }
+        
+        .ai-panel fieldset { border: 1px solid var(--accent-cyan); padding: 1rem; }
+        .ai-panel legend {
+            font-family: var(--font-heading);
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            padding: 0 0.5rem;
+        }
     </style>
 </head>
 <body>
@@ -233,10 +326,10 @@
     <!-- ===== HEADER & NAV ==== -->
     <!-- ======================= -->
     <header>
-        <div class="logo">Lunarith<span>.</span></div>
+        <div class="logo">LUNARITH<span>.</span></div>
         <div class="tab-buttons">
-            <button class="tab-btn active" data-tab="reader-tab">📖 Reader</button>
-            <button class="tab-btn" data-tab="creator-tab">✨ Creator</button>
+            <button class="tab-btn active" data-tab="reader-tab">// READER</button>
+            <button class="tab-btn" data-tab="creator-tab">// CREATOR_</button>
         </div>
     </header>
 
@@ -250,12 +343,12 @@
         <div id="reader-tab" class="tab-content active">
             <h1>Story Library</h1>
             
-            <h2 style="color: var(--accent-primary); border-bottom-color: var(--accent-primary);">Featured Stories</h2>
+            <h2 style="color: var(--accent-pink); border-bottom-color: var(--accent-pink);">// FEATURED TRANSMISSIONS</h2>
             <div class="story-library-grid" id="featured-story-grid">
                 <!-- Featured stories from /stories/index.json go here -->
             </div>
             
-            <h2 style="margin-top: 2rem;">Your Creations</h2>
+            <h2 style="margin-top: 2rem;">// YOUR CREATIONS</h2>
             <div class="story-library-grid" id="user-story-grid">
                 <!-- User's local stories go here -->
             </div>
@@ -268,63 +361,63 @@
             <div class="creator-layout">
                 <!-- === Creator Sidebar === -->
                 <aside class="creator-sidebar">
-                    <h2>Backend Status</h2>
+                    <h2>// SYSTEM_STATUS</h2>
                     <div style="display: flex; align-items: center; margin-bottom: 1rem;">
                         <span id="status-light" class="status-light"></span>
-                        <span id="status-text">Disconnected</span>
+                        <span id="status-text">OFFLINE</span>
                     </div>
-                    <button id="connect-btn" class="btn-primary" style="width: 100%;">Connect to Backend</button>
+                    <button id="connect-btn" class="btn-primary" style="width: 100%;">[ CONNECT_TO_BACKEND ]</button>
 
-                    <h2 style="margin-top: 2rem;">Creation Manager</h2>
+                    <h2 style="margin-top: 2rem;">// DATA_MANAGER</h2>
                     <div class="button-group" style="flex-direction: column; gap: 0.75rem;">
-                        <button id="new-story-btn" class="btn-primary">Create New Story</button>
-                        <button id="import-btn" class="btn-secondary">Import Creations (.json)</button>
-                        <button id="export-btn" class="btn-secondary">Export Creations (.json)</button>
+                        <button id="new-story-btn" class="btn-primary">[ + NEW_STORY ]</button>
+                        <button id="import-btn" class="btn-secondary">[ IMPORT_DATA (.json) ]</button>
+                        <button id="export-btn" class="btn-secondary">[ EXPORT_DATA (.json) ]</button>
                     </div>
 
                     <div class="story-tree-container">
-                        <h3>Your Creations Navigator</h3>
-                        <div id="story-tree" class="story-tree">
-                            <p>No story selected.</p>
+                        <h3>// CREATIONS_NAVIGATOR</h3>
+                        <div id="story-tree" class_name="story-tree">
+                            <p>// NO_STORY_LOADED</p>
                         </div>
                     </div>
                 </aside>
 
                 <!-- === Creator Main Panel === -->
                 <main class="creator-main">
-                    <h2 id="editor-node-title">Select a Chapter to Edit</h2>
+                    <h2 id="editor-node-title">// SELECT_NODE_TO_EDIT</h2>
                     <div class="button-group" style="margin-bottom: 1.5rem;">
-                        <button id="save-node-btn" class="btn-primary" disabled>💾 Save Chapter</button>
-                        <button id="delete-node-btn" class="btn-secondary" disabled>🗑️ Delete Chapter</button>
+                        <button id="save-node-btn" class="btn-primary" disabled>[ SAVE_CHAPTER ]</button>
+                        <button id="delete-node-btn" class="btn-secondary" disabled>[ DELETE_CHAPTER ]</button>
                     </div>
 
-                    <label for="node-title-input">Chapter Title:</label>
-                    <input type="text" id="node-title-input" placeholder="e.g., Chapter 1: The Beginning" disabled>
+                    <label for="node-title-input">// CHAPTER_TITLE:</label>
+                    <input type="text" id="node-title-input" placeholder="e.g., CH_1: THE_AWAKENING" disabled>
                     
-                    <label for="node-content-textarea">Chapter Content:</label>
-                    <textarea id="node-content-textarea" rows="10" placeholder="Write your story here..." disabled></textarea>
+                    <label for="node-content-textarea">// CHAPTER_CONTENT:</label>
+                    <textarea id="node-content-textarea" rows="10" placeholder="// Write your story here..." disabled></textarea>
 
-                    <h3>Story Choices (Branches)</h3>
+                    <h3>// STORY_BRANCHES (CHOICES)</h3>
                     <div id="node-choices-editor">
                         <!-- Choice editor fields go here -->
                     </div>
-                    <button id="add-choice-btn" class="btn-secondary" disabled>Add New Choice</button>
+                    <button id="add-choice-btn" class="btn-secondary" disabled>[ + ADD_CHOICE ]</button>
 
                     <!-- AI Panel -->
                     <fieldset id="ai-controls" disabled style="margin-top: 2rem;">
-                        <legend>AI Assistant</legend>
+                        <legend>// AI_ASSISTANT</legend>
                         
-                        <label for="model-select">Model:</label>
+                        <label for="model-select">// MODEL:</label>
                         <select id="model-select">
-                            <option value="">-- Disconnected --</option>
+                            <option value="">-- OFFLINE --</option>
                         </select>
                         
-                        <label for="ai-instruction">Prompt / Instruction:</label>
-                        <textarea id="ai-instruction" rows="3" placeholder="e.g., 'Write a tense scene where the hero finds a mysterious amulet.' or 'Make the current chapter longer.'"></textarea>
+                        <label for="ai-instruction">// PROMPT_INSTRUCTION:</label>
+                        <textarea id="ai-instruction" rows="3" placeholder="// e.g., 'Write a tense scene where the hero finds a mysterious amulet.'"></textarea>
 
                         <div class="button-group">
-                            <button id="ai-generate-content-btn" class="btn-primary">Generate Chapter Content</button>
-                            <button id="ai-generate-choices-btn" class="btn-secondary">Suggest 3 Choices</button>
+                            <button id="ai-generate-content-btn" class="btn-primary">[ GENERATE_CONTENT ]</button>
+                            <button id="ai-generate-choices-btn" class="btn-secondary">[ SUGGEST_3_CHOICES ]</button>
                         </div>
                     </fieldset>
                 </main>
@@ -338,25 +431,25 @@
     <div id="reader-view" class="reader-view" style="display: none;">
         <header class="reader-header">
             <h2 id="reader-title" class="reader-title">Story Title</h2>
-            <button id="reader-close-btn" class="btn-secondary">Close Reader</button>
+            <button id="reader-close-btn" class="btn-secondary">[ CLOSE_READER ]</button>
         </header>
 
         <div class="reader-content-wrapper">
             <!-- TTS Player -->
             <div class="tts-player">
                 <div class="tts-controls-main">
-                    <button id="tts-play" class="btn-primary">▶️</button>
-                    <button id="tts-pause" class="btn-secondary">⏸️</button>
-                    <button id="tts-stop" class="btn-secondary">⏹️</button>
-                    <span id="tts-status" class="tts-status">Idle</span>
+                    <button id="tts-play" class="btn-primary" title="Play">▶️</button>
+                    <button id="tts-pause" class="btn-secondary" title="Pause">⏸️</button>
+                    <button id="tts-stop" class="btn-secondary" title="Stop">⏹️</button>
+                    <span id="tts-status" class="tts-status">IDLE</span>
                 </div>
                 <div class="tts-controls-settings">
                     <div class="tts-setting">
-                        <label for="tts-voice-select">Voice:</label>
+                        <label for="tts-voice-select">// VOICE:</label>
                         <select id="tts-voice-select"></select>
                     </div>
                     <div class="tts-setting">
-                        <label for="tts-rate-slider">Speed: <span id="tts-rate-label">1x</span></label>
+                        <label for="tts-rate-slider">// SPEED: <span id="tts-rate-label">1x</span></label>
                         <input type="range" id="tts-rate-slider" min="0.5" max="2" value="1" step="0.1">
                     </div>
                 </div>
@@ -371,7 +464,7 @@
             </div>
 
             <div class="reader-choices" id="reader-choices">
-                <h3>What happens next?</h3>
+                <h3>// WHAT_HAPPENS_NEXT?</h3>
                 <!-- Choice buttons go here -->
             </div>
         </div>
@@ -386,7 +479,7 @@
 
             // --- STATE & CONSTANTS ---
             const API_URL = "https://fugthchat-fugthdes.hf.space";
-            const DB_KEY = "lunarith_user_stories_v3"; // Key for user's own creations
+            const DB_KEY = "lunarith_user_stories_v3_punk"; // Key for user's own creations
             
             let featuredStories = {}; // Stories from /stories/index.json
             let userStories = {};     // Stories from localStorage
@@ -403,7 +496,7 @@
             const synth = window.speechSynthesis;
             let voices = [];
             
-            // --- SELECTORS ---
+            // --- SELECTORS (cache all) ---
             const tabButtons = document.querySelectorAll('.tab-btn');
             const tabContents = document.querySelectorAll('.tab-content');
             const featuredStoryGrid = document.getElementById('featured-story-grid');
@@ -457,14 +550,13 @@
                 } catch (e) { console.error("Error saving user stories:", e); alert("Error: Could not save data."); }
             }
             
-            /** This is the NEW function to load from your stories/ folder */
             async function loadFeaturedStories() {
                 try {
-                    const response = await fetch('stories/index.json');
-                    if (!response.ok) throw new Error('Failed to load stories/index.json. Create this file.');
+                    // This fetches the "manifest" file from your GitHub repo
+                    const response = await fetch('stories/index.json'); 
+                    if (!response.ok) throw new Error('Failed to load stories/index.json. Create this file in your repo.');
                     const index = await response.json();
                     
-                    // Convert array to object for easier lookup
                     featuredStories = index.reduce((acc, story) => {
                         acc[story.id] = story;
                         return acc;
@@ -496,10 +588,10 @@
             
             async function checkBackendStatus() {
                 statusLight.className = 'status-light connecting';
-                statusText.textContent = 'Connecting...';
+                statusText.textContent = 'CONNECTING...';
                 connectBtn.disabled = true;
                 aiControls.disabled = true;
-                modelSelect.innerHTML = '<option value="">-- Connecting... --</option>';
+                modelSelect.innerHTML = '<option value="">-- CONNECTING... --</option>';
                 
                 try {
                     const response = await fetch(API_URL + "/");
@@ -511,32 +603,32 @@
                     }
                     
                     statusLight.className = 'status-light connected';
-                    statusText.textContent = `Connected (${data.model_loaded})`;
+                    statusText.textContent = `CONNECTED (${data.model_loaded})`;
                     isBackendConnected = true;
+                    // Re-check if editor should be enabled
                     if(currentStoryId && !currentStoryIsFeatured) {
-                        aiControls.disabled = false;
+                         setEditorDisabled(false);
                     }
                     
-                    // Populate model selector
-                    modelSelect.innerHTML = ''; // Clear
+                    modelSelect.innerHTML = ''; 
                     if (data.models && data.models.length > 0) {
                         data.models.forEach(modelName => {
                             const option = document.createElement('option');
                             option.value = modelName;
-                            option.textContent = modelName.charAt(0).toUpperCase() + modelName.slice(1);
+                            option.textContent = modelName.toUpperCase();
                             modelSelect.appendChild(option);
                         });
                     } else {
-                        modelSelect.innerHTML = '<option value="default">Default Model</option>';
+                        modelSelect.innerHTML = '<option value="default">DEFAULT_MODEL</option>';
                     }
                     
                 } catch (err) {
                     console.error("Backend connection failed:", err);
                     statusLight.className = 'status-light error';
-                    statusText.textContent = 'Connection Failed';
+                    statusText.textContent = 'CONNECTION_FAILED';
                     isBackendConnected = false;
                     aiControls.disabled = true;
-                    modelSelect.innerHTML = '<option value="">-- Disconnected --</option>';
+                    modelSelect.innerHTML = '<option value="">-- OFFLINE --</option>';
                 } finally {
                     connectBtn.disabled = false;
                 }
@@ -545,11 +637,10 @@
             // --- READER TAB & VIEW ---
             
             function renderReaderLibrary() {
-                // Render Featured Stories
                 featuredStoryGrid.innerHTML = '';
                 const featuredStoryIds = Object.keys(featuredStories);
                 if (featuredStoryIds.length === 0) {
-                    featuredStoryGrid.innerHTML = `<p style="color: var(--text-secondary);">No featured stories found. (Check 'stories/index.json')</p>`;
+                    featuredStoryGrid.innerHTML = `<p style="color: var(--text-secondary);">// NO_FEATURED_TRANSMISSIONS_FOUND. (Check 'stories/index.json')</p>`;
                 } else {
                     featuredStoryIds.forEach(storyId => {
                         const story = featuredStories[storyId];
@@ -558,11 +649,10 @@
                     });
                 }
                 
-                // Render User Stories
                 userStoryGrid.innerHTML = '';
                 const userStoryIds = Object.keys(userStories);
                 if (userStoryIds.length === 0) {
-                    userStoryGrid.innerHTML = `<p style="color: var(--text-secondary);">You haven't created any stories yet. Go to the "Creator" tab to start.</p>`;
+                    userStoryGrid.innerHTML = `<p style="color: var(--text-secondary);">// NO_CREATIONS_FOUND. Use 'CREATOR' tab to begin.</p>`;
                 } else {
                     userStoryIds.forEach(storyId => {
                         const story = userStories[storyId];
@@ -575,11 +665,13 @@
             function createStoryCard(storyId, story, isFeatured) {
                 const card = document.createElement('div');
                 card.className = 'story-card';
+                // Use a placeholder if cover is missing
+                const coverImg = story.cover || `https://placehold.co/300x450/${isFeatured ? 'f900e5' : '00f0ff'}/0a0a0f?text=${encodeURIComponent(story.title)}`;
                 card.innerHTML = `
-                    <img class="story-card-cover" src="${story.cover || 'https://placehold.co/300x450/0F0F0F/FF4500?text=' + encodeURIComponent(story.title)}" alt="Cover for ${story.title}">
+                    <img class="story-card-cover" src="${coverImg}" alt="Cover for ${story.title}">
                     <div class="story-card-content">
                         <h3 class="story-card-title">${story.title}</h3>
-                        <p class="story-card-author">by ${story.author || 'Unknown'}</p>
+                        <p class="story-card-author">by ${story.author || 'UNKNOWN_AUTHOR'}</p>
                     </div>
                 `;
                 card.addEventListener('click', () => openReader(storyId, 'root', isFeatured));
@@ -591,22 +683,21 @@
                 
                 let storyData;
                 if (isFeatured) {
-                    // Featured story: fetch its full JSON from the stories/ folder
                     try {
-                        const path = featuredStories[storyId].path;
+                        // This is the key change: it fetches the story from the folder.
+                        const path = featuredStories[storyId].path; 
                         if (!path) throw new Error("Story path not defined in index.json");
                         
                         const response = await fetch(path);
                         if (!response.ok) throw new Error(`Could not fetch story file: ${path}`);
                         storyData = await response.json();
-                        activeStoryData = storyData; // Cache the full story data
+                        activeStoryData = storyData;
                     } catch (e) {
                         console.error(e);
                         alert("Error: Could not load featured story data.");
                         return;
                     }
                 } else {
-                    // User story: load from local state
                     storyData = userStories[storyId];
                     activeStoryData = storyData;
                 }
@@ -622,7 +713,7 @@
             function closeReader() {
                 stopTTS();
                 readerView.style.display = 'none';
-                activeStoryData = null; // Clear cached story data
+                activeStoryData = null;
             }
             
             function getBreadcrumbPath(nodeId) {
@@ -656,7 +747,6 @@
                 currentNodeId = nodeId;
                 readerTitle.textContent = activeStoryData.title;
                 
-                // Render Breadcrumbs
                 readerBreadcrumbs.innerHTML = '';
                 const path = getBreadcrumbPath(nodeId);
                 path.forEach((step, index) => {
@@ -672,8 +762,7 @@
                     }
                 });
                 
-                // Prepare content for TTS & display
-                const content = node.content || "This chapter is empty.";
+                const content = node.content || "// This chapter is empty.";
                 const paragraphs = content.split('\n');
                 readerTextContent.innerHTML = '';
                 ttsSentences = [];
@@ -695,8 +784,7 @@
                     readerTextContent.appendChild(p);
                 });
 
-                // Render Choices
-                readerChoices.innerHTML = '<h3>What happens next?</h3>';
+                readerChoices.innerHTML = '<h3>// WHAT_HAPPENS_NEXT?</h3>';
                 if (node.choices && node.choices.length > 0) {
                     node.choices.forEach(choice => {
                         const btn = document.createElement('button');
@@ -706,7 +794,7 @@
                         readerChoices.appendChild(btn);
                     });
                 } else {
-                    readerChoices.innerHTML += `<p><i>You've reached an ending.</i></p>`;
+                    readerChoices.innerHTML += `<p><i>// END_OF_TRANSMISSION</i></p>`;
                 }
             }
 
@@ -739,7 +827,7 @@
             }
 
             function playTTS() {
-                if (synth.paused) { synth.resume(); ttsStatus.textContent = 'Speaking...'; return; }
+                if (synth.paused) { synth.resume(); ttsStatus.textContent = 'SPEAKING...'; return; }
                 if (synth.speaking) return;
                 ttsCurrentSentenceIdx = 0;
                 speakNextSentence();
@@ -774,17 +862,17 @@
                 ttsUtterance.onerror = (e) => console.error("TTS Error:", e);
                 
                 synth.speak(ttsUtterance);
-                ttsStatus.textContent = 'Speaking...';
+                ttsStatus.textContent = 'SPEAKING...';
             }
             
             function pauseTTS() {
-                if (synth.speaking) { synth.pause(); ttsStatus.textContent = 'Paused'; }
+                if (synth.speaking) { synth.pause(); ttsStatus.textContent = 'PAUSED'; }
             }
             
             function stopTTS() {
                 synth.cancel();
                 ttsCurrentSentenceIdx = 0;
-                ttsStatus.textContent = 'Idle';
+                ttsStatus.textContent = 'IDLE';
                 document.querySelectorAll('.tts-highlight').forEach(el => el.classList.remove('tts-highlight'));
             }
 
@@ -793,7 +881,7 @@
             function renderCreatorList() {
                 const storyIds = Object.keys(userStories);
                 if (storyIds.length === 0) {
-                    storyTree.innerHTML = `<p style="color: var(--text-secondary);">No stories created yet.</p>`;
+                    storyTree.innerHTML = `<p style="color: var(--text-secondary);">// NO_CREATIONS_FOUND.</p>`;
                     return;
                 }
                 
@@ -805,7 +893,7 @@
                     const li = document.createElement('li');
                     const div = document.createElement('div');
                     div.className = 'tree-node';
-                    div.textContent = `📖 ${story.title}`;
+                    div.textContent = `> ${story.title}`;
                     if (storyId === currentStoryId && !currentStoryIsFeatured) {
                         div.classList.add('active');
                     }
@@ -836,7 +924,7 @@
                 const storyNodes = storyTree.querySelectorAll('.story-tree > li > .tree-node');
                 let activeStoryLi = null;
                 storyNodes.forEach(n => {
-                    if (n.textContent === `📖 ${story.title}`) {
+                    if (n.textContent === `> ${story.title}`) {
                         activeStoryLi = n.parentElement;
                         n.classList.add('active');
                     } else { n.classList.remove('active'); }
@@ -855,7 +943,7 @@
                     const li = document.createElement('li');
                     const div = document.createElement('div');
                     div.className = 'tree-node';
-                    div.textContent = node.title || "Untitled Chapter";
+                    div.textContent = node.title || "UNTITLED_NODE";
                     div.dataset.nodeId = nodeId;
                     if (nodeId === currentNodeId) { div.classList.add('active'); }
                     
@@ -878,7 +966,7 @@
             }
             
             function createNewStory() {
-                const title = prompt("Enter a title for your new story:", "My New Story");
+                const title = prompt("Enter new story title:", "My New Story");
                 if (!title) return;
                 const author = "Me";
                 
@@ -886,9 +974,9 @@
                 userStories[storyId] = {
                     title,
                     author,
-                    cover: `https://placehold.co/300x450/${Math.floor(Math.random()*16777215).toString(16)}/FFFFFF?text=${encodeURIComponent(title)}`,
+                    cover: `https://placehold.co/300x450/${Math.floor(Math.random()*16777215).toString(16)}/0a0a0f?text=${encodeURIComponent(title)}`,
                     nodes: {
-                        "root": { title: "Chapter 1: The Beginning", content: "Once upon a time...", choices: [] }
+                        "root": { title: "Chapter 1", content: "...", choices: [] }
                     }
                 };
                 
@@ -901,13 +989,20 @@
             }
             
             function setEditorDisabled(disabled) {
-                editorNodeTitle.textContent = disabled ? "Select a Creation to Edit" : editorNodeTitle.textContent;
+                editorNodeTitle.textContent = disabled ? "// SELECT_CREATION_TO_EDIT" : editorNodeTitle.textContent;
                 nodeTitleInput.disabled = disabled;
                 nodeContentTextarea.disabled = disabled;
                 addChoiceBtn.disabled = disabled;
                 saveNodeBtn.disabled = disabled;
                 deleteNodeBtn.disabled = disabled;
-                if(isBackendConnected) { aiControls.disabled = disabled; }
+                
+                // Only change AI controls if backend is connected
+                if(isBackendConnected) { 
+                    aiControls.disabled = disabled;
+                } else {
+                    aiControls.disabled = true; // Always disabled if not connected
+                }
+                
                 if (disabled) {
                      nodeTitleInput.value = "";
                      nodeContentTextarea.value = "";
@@ -929,7 +1024,7 @@
                 const node = userStories[storyId].nodes[nodeId];
                 if (!node) return;
                 
-                editorNodeTitle.textContent = `Editing: ${node.title}`;
+                editorNodeTitle.textContent = `// EDITING: ${node.title}`;
                 nodeTitleInput.value = node.title;
                 nodeContentTextarea.value = node.content;
                 
@@ -943,13 +1038,13 @@
             
             function saveNode() {
                 if (!currentStoryId || !currentNodeId || currentStoryIsFeatured) {
-                    alert("Cannot save. No user story chapter is selected."); return;
+                    alert("ERROR: NO_WRITABLE_NODE_SELECTED."); return;
                 }
                 
                 const story = userStories[currentStoryId];
                 const node = story.nodes[currentNodeId];
                 
-                node.title = nodeTitleInput.value || "Untitled Chapter";
+                node.title = nodeTitleInput.value || "UNTITLED_NODE";
                 node.content = nodeContentTextarea.value;
                 
                 const choiceInputs = nodeChoicesEditor.querySelectorAll('.choice-editor-item input');
@@ -959,7 +1054,7 @@
                 }));
                 
                 saveUserStories();
-                editorNodeTitle.textContent = `Editing: ${node.title}`;
+                editorNodeTitle.textContent = `// EDITING: ${node.title}`;
                 renderStoryTree(currentStoryId);
             }
             
@@ -968,7 +1063,7 @@
                 nodeChoicesEditor.innerHTML = '';
                 
                 if (!node.choices || node.choices.length === 0) {
-                    nodeChoicesEditor.innerHTML = `<p style="color: var(--text-secondary);">No choices for this chapter yet.</p>`;
+                    nodeChoicesEditor.innerHTML = `<p style="color: var(--text-secondary);">// NO_BRANCHES_FOR_THIS_NODE.</p>`;
                     return;
                 }
                 
@@ -983,12 +1078,14 @@
                     
                     const gotoBtn = document.createElement('button');
                     gotoBtn.className = 'btn-secondary';
-                    gotoBtn.textContent = 'Edit ➔';
+                    gotoBtn.textContent = 'EDIT >';
                     gotoBtn.title = `Go to chapter: ${userStories[storyId].nodes[choice.targetNodeId]?.title}`;
                     gotoBtn.onclick = () => loadNodeInEditor(storyId, choice.targetNodeId);
                     
                     const deleteBtn = document.createElement('button');
                     deleteBtn.className = 'btn-secondary';
+                    deleteBtn.style.borderColor = 'var(--accent-pink)';
+                    deleteBtn.style.color = 'var(--accent-pink)';
                     deleteBtn.textContent = 'X';
                     deleteBtn.title = 'Remove this choice and delete its branch';
                     deleteBtn.onclick = () => deleteChoiceAndBranch(storyId, nodeId, choice.targetNodeId);
@@ -1005,7 +1102,7 @@
                     alert("Please select a user story chapter first."); return;
                 }
                 
-                const choiceText = prompt("Enter the text for this new choice:", "...");
+                const choiceText = prompt("Enter text for this new choice:", "...");
                 if (!choiceText) return;
                 
                 const story = userStories[currentStoryId];
@@ -1023,7 +1120,7 @@
             
             function deleteChoiceAndBranch(storyId, parentNodeId, targetNodeId) {
                 if (targetNodeId === 'root') return;
-                if (!confirm("Are you sure? This will delete this choice and ALL chapters that follow it.")) return;
+                if (!confirm("CONFIRM: Delete this choice and ALL chapters that follow it?")) return;
                 
                 const story = userStories[storyId];
                 const parentNode = story.nodes[parentNodeId];
@@ -1048,7 +1145,7 @@
 
             function deleteCurrentNode() {
                 if (!currentStoryId || !currentNodeId || currentNodeId === 'root' || currentStoryIsFeatured) {
-                    alert("Cannot delete the root chapter or a featured story node."); return;
+                    alert("ERROR: Cannot delete root node or featured story node."); return;
                 }
 
                 const story = userStories[currentStoryId];
@@ -1060,16 +1157,16 @@
                     deleteChoiceAndBranch(currentStoryId, parentId, currentNodeId);
                     loadNodeInEditor(currentStoryId, parentId);
                 } else {
-                    alert("Error: Could not find parent node. Cannot delete.");
+                    alert("ERROR: CANNOT_FIND_PARENT_NODE.");
                 }
             }
 
             // --- AI GENERATION ---
             
             async function handleAiGeneration(mode) {
-                if (!isBackendConnected) { alert("Backend is not connected."); return; }
+                if (!isBackendConnected) { alert("ERROR: BACKEND_OFFLINE."); return; }
                 if (!currentStoryId || !currentNodeId || currentStoryIsFeatured) {
-                    alert("Please select one of *your* story chapters to edit."); return;
+                    alert("ERROR: SELECT_WRITABLE_NODE_FIRST."); return;
                 }
                 
                 const story = userStories[currentStoryId];
@@ -1078,7 +1175,8 @@
                 const model = modelSelect.value;
                 
                 let story_memory = "";
-                const path = getBreadcrumbPath(node.id); // This needs to use the correct data
+                activeStoryData = story; // Ensure breadcrumb generator uses local data
+                const path = getBreadcrumbPath(currentNodeId);
                 path.slice(0, -1).forEach(step => {
                     const parentNode = story.nodes[step.id];
                     if (parentNode) {
@@ -1086,18 +1184,18 @@
                     }
                 });
                 
-                let prompt, finalAiPrompt;
+                let prompt, finalAiPrompt, btnToDisable;
                 if (mode === 'generate_content') {
-                    prompt = node.content;
-                    finalAiPrompt = `Here is the story so far:\n${story_memory}\n\nMy instruction is: ${instruction}\n\nGenerate the *full text* for the chapter titled "${node.title}":`;
-                    aiGenerateContentBtn.disabled = true;
-                    aiGenerateContentBtn.textContent = 'Generating...';
+                    btnToDisable = aiGenerateContentBtn;
+                    finalAiPrompt = `Here is the story so far:\n${story_memory}\n\nMy instruction is: ${instruction || 'Continue the story'}\n\nGenerate the *full text* for the chapter titled "${node.title}":`;
                 } else { // generate_choices
-                    prompt = node.content;
-                    finalAiPrompt = `The following is a chapter from a story:\n\n${prompt}\n\nBased on this text, generate exactly 3 short, distinct, and interesting choices for what the character could do next. Format them as a simple list, one per line. For example:\n- Go into the cave.\n- Check the old map.\n- Wait until nightfall.`
-                    aiGenerateChoicesBtn.disabled = true;
-                    aiGenerateChoicesBtn.textContent = 'Generating...';
+                    btnToDisable = aiGenerateChoicesBtn;
+                    finalAiPrompt = `The following is a chapter from a story:\n\n${node.content}\n\nBased on this text, generate exactly 3 short, distinct, and interesting choices for what the character could do next. Format them as a simple list, one per line. For example:\n- Go into the cave.\n- Check the old map.\n- Wait until nightfall.`
                 }
+                
+                const originalBtnText = btnToDisable.textContent;
+                btnToDisable.disabled = true;
+                btnToDisable.textContent = 'GENERATING...';
                 
                 try {
                     const response = await fetch(API_URL + "/generate", {
@@ -1105,18 +1203,18 @@
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({
                             prompt: finalAiPrompt,
-                            feedback: "",
+                            feedback: "", // Feedback is now part of the main instruction
                             story_memory: story_memory,
                             model_choice: model
                         })
                     });
                     
                     const data = await response.json();
-                    if (response.status !== 200) throw new Error(data.error || "Unknown server error");
+                    if (!response.ok) throw new Error(data.error || "Unknown server error");
                     
                     if (mode === 'generate_content') {
                         nodeContentTextarea.value = data.story_text;
-                        saveNode(); // Auto-save
+                        saveNode();
                     } else {
                         const choices = data.story_text.split('\n').map(c => c.trim().replace(/^- /g, '')).filter(c => c.length > 0);
                         if(confirm(`Add these generated choices?\n\n${choices.join('\n')}`)) {
@@ -1133,12 +1231,10 @@
                     
                 } catch (err) {
                     console.error("AI Generation Error:", err);
-                    alert(`An error occurred: ${err.message}`);
+                    alert(`ERROR: ${err.message}`);
                 } finally {
-                    aiGenerateContentBtn.disabled = false;
-                    aiGenerateContentBtn.textContent = 'Generate Chapter Content';
-                    aiGenerateChoicesBtn.disabled = false;
-                    aiGenerateChoicesBtn.textContent = 'Suggest 3 Choices';
+                    btnToDisable.disabled = false;
+                    btnToDisable.textContent = originalBtnText;
                 }
             }
             
@@ -1146,10 +1242,9 @@
             
             function exportData() {
                 if (Object.keys(userStories).length === 0) {
-                    alert("You have no creations to export.");
-                    return;
+                    alert("ERROR: NO_CREATIONS_TO_EXPORT."); return;
                 }
-                if (!confirm("This will export your *local creations* library as a single JSON file. Continue?")) return;
+                if (!confirm("This will export your *local creations* library as a single JSON file. This file can be used to import later or to manually add to your 'stories/' folder on GitHub.")) return;
                 try {
                     const data = JSON.stringify(userStories, null, 2);
                     const blob = new Blob([data], { type: 'application/json' });
@@ -1163,7 +1258,7 @@
             }
             
             function importData() {
-                if (!confirm("WARNING: This will *replace* all your local creations with the data from the file. Are you sure?")) return;
+                if (!confirm("WARNING: This will *replace* all your local creations with the data from the file. This cannot be undone.")) return;
                 
                 const input = document.createElement('input');
                 input.type = 'file';
@@ -1177,18 +1272,17 @@
                         try {
                             const data = JSON.parse(event.target.result);
                             if (typeof data !== 'object' || Array.isArray(data)) {
-                                throw new Error("Invalid file format. Must be an object of stories.");
+                                throw new Error("Invalid file format.");
                             }
                             userStories = data;
                             saveUserStories();
                             currentStoryId = null;
                             currentNodeId = null;
                             setEditorDisabled(true);
-Analyst
                             renderReaderLibrary();
                             renderCreatorList();
-                            alert("Creations library imported successfully!");
-                        } catch (err) { alert("Error importing file: " + err.message); }
+                            alert("IMPORT_SUCCESSFUL.");
+                        } catch (err) { alert("ERROR_IMPORTING_FILE: " + err.message); }
                     };
                     reader.readAsText(file);
                 };
@@ -1198,6 +1292,7 @@ Analyst
             // --- INITIALIZE ---
             
             async function init() {
+                // Attach main event listeners
                 tabButtons.forEach(btn => btn.addEventListener('click', switchTab));
                 connectBtn.addEventListener('click', checkBackendStatus);
                 readerCloseBtn.addEventListener('click', closeReader);
@@ -1211,13 +1306,16 @@ Analyst
                 aiGenerateContentBtn.addEventListener('click', () => handleAiGeneration('generate_content'));
                 aiGenerateChoicesBtn.addEventListener('click', () => handleAiGeneration('generate_choices'));
 
+                // Load data
                 loadUserStories();
-                await loadFeaturedStories(); // Wait for featured stories to load from /stories/
+                await loadFeaturedStories(); // Wait for featured stories to load
                 
+                // Render initial views
                 renderReaderLibrary();
                 setEditorDisabled(true);
                 
-                checkBackendStatus(); // Auto-connect
+                // Auto-connect
+                checkBackendStatus();
             }
 
             init();
