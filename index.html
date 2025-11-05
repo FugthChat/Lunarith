@@ -49,7 +49,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1rem 2rem;
+            padding: 1rem 1.5rem; /* More mobile friendly */
             background-color: var(--bg-primary);
             border-bottom: 1px solid var(--border-color);
             box-shadow: var(--shadow);
@@ -57,19 +57,19 @@
             z-index: 10;
         }
         .logo {
-            font-size: 1.75rem;
+            font-size: 1.5rem; /* Smaller for mobile */
             font-weight: 700;
             color: var(--text-primary);
         }
         .logo span {
             color: var(--accent-primary);
         }
-        .tab-buttons { display: flex; gap: 0.5rem; }
+        .tab-buttons { display: flex; gap: 0.25rem; }
         .tab-btn {
             font-family: var(--font-family);
-            font-size: 1rem;
+            font-size: 0.9rem; /* Smaller for mobile */
             font-weight: 600;
-            padding: 0.5rem 1.25rem;
+            padding: 0.5rem 1rem;
             background: transparent;
             color: var(--text-secondary);
             border: 0;
@@ -89,12 +89,14 @@
         main {
             flex-grow: 1;
             display: flex;
-            overflow: hidden; /* Key for two-panel layout */
+            overflow: hidden;
+            height: 100%; /* Fill remaining height */
         }
         .tab-content {
             display: none;
             width: 100%;
             height: 100%;
+            overflow-y: auto; /* Allow tabs to scroll */
         }
         .tab-content.active {
             display: block;
@@ -145,6 +147,15 @@
             background-color: var(--bg-secondary);
             border-color: var(--text-secondary);
         }
+        .btn-danger {
+            background-color: transparent;
+            color: var(--accent-danger);
+            border-color: var(--accent-danger);
+        }
+        .btn-danger:hover {
+            background-color: var(--accent-danger);
+            color: #FFF;
+        }
         button:disabled {
             background-color: var(--bg-tertiary) !important;
             color: var(--text-secondary) !important;
@@ -183,14 +194,17 @@
 
         /* --- READER TAB --- */
         #reader-tab {
-            overflow-y: auto;
-            padding: 2rem;
-            height: 100%;
+            padding: 1.5rem;
         }
         .story-library-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* Smaller cards for mobile */
+            gap: 1rem;
+        }
+        @media (min-width: 600px) {
+            .story-library-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Larger cards for desktop */
+            }
         }
         .story-card {
             background-color: var(--bg-primary);
@@ -207,13 +221,18 @@
         }
         .story-card-cover {
             width: 100%;
-            height: 320px;
+            height: 220px; /* Shorter for mobile */
             object-fit: cover;
             background-color: var(--bg-secondary);
         }
+        @media (min-width: 600px) {
+            .story-card-cover {
+                height: 300px; /* Taller for desktop */
+            }
+        }
         .story-card-content { padding: 1rem; }
         .story-card-title {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: 600;
             white-space: nowrap;
             overflow: hidden;
@@ -240,19 +259,19 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1rem 2rem;
+            padding: 1rem 1.5rem;
             background-color: var(--bg-primary);
             border-bottom: 1px solid var(--border-color);
             flex-shrink: 0;
         }
-        .reader-title { font-size: 1.5rem; font-weight: 600; }
+        .reader-title { font-size: 1.25rem; font-weight: 600; }
         .reader-content-wrapper {
             flex-grow: 1;
             overflow-y: auto;
             max-width: 800px;
             width: 100%;
             margin: 0 auto;
-            padding: 2rem;
+            padding: 1.5rem;
         }
         .reader-breadcrumbs { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1.5rem; }
         .reader-breadcrumbs span { cursor: pointer; }
@@ -295,42 +314,70 @@
         
         /* --- NEW CREATOR TAB --- */
         #creator-tab {
-            display: grid;
-            grid-template-columns: 1fr 1fr; /* Two main columns */
+            display: flex;
+            flex-direction: column; /* Mobile-first: single column */
             height: 100%;
             overflow: hidden;
         }
         
         /* Left Panel (Input) */
-        .creator-input-panel {
-            display: flex;
-            flex-direction: column;
+        .creator-sidebar {
             padding: 1.5rem;
-            border-right: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
             overflow-y: auto;
             background-color: var(--bg-secondary);
+            flex-shrink: 0;
         }
         
         /* Right Panel (Output) */
-        .creator-output-panel {
+        .creator-main {
+            padding: 1.5rem;
             display: flex;
             flex-direction: column;
-            padding: 1.5rem;
             overflow-y: auto;
+            flex-grow: 1; /* Takes remaining space */
+        }
+
+        /* Desktop layout */
+        @media (min-width: 769px) {
+            #creator-tab {
+                flex-direction: row; /* Two columns on desktop */
+            }
+            .creator-sidebar {
+                width: 400px;
+                border-right: 1px solid var(--border-color);
+                border-bottom: none;
+                height: 100%;
+            }
+            .creator-main {
+                width: auto;
+                flex-grow: 1;
+                height: 100%;
+            }
         }
 
         .panel-section {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 1rem;
             margin-bottom: 1.5rem;
         }
-
-        #ai-context-input, #ai-prompt-input {
-            height: 200px;
+        .panel-section h3 {
+            margin-top: 0;
             font-size: 1rem;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
         }
+
+        #ai-context-input { height: 150px; }
+        #ai-prompt-input { height: 100px; }
 
         #ai-output-canvas {
             flex-grow: 1;
-            height: 400px;
+            height: 300px;
             font-size: 1.1rem;
             line-height: 1.7;
             background-color: var(--bg-secondary);
@@ -365,24 +412,65 @@
         .status-light.error { background-color: #F56C6C; }
         #status-text { color: var(--text-secondary); }
 
-        /* Mobile adjustments */
-        @media (max-width: 768px) {
-            #creator-tab {
-                grid-template-columns: 1fr; /* Single column */
-                overflow-y: auto; /* Allow scrolling */
-            }
-            .creator-input-panel {
-                border-right: none;
-                border-bottom: 1px solid var(--border-color);
-            }
-            header {
-                flex-direction: column;
-                padding: 1rem;
-            }
-            .logo { margin-bottom: 0.5rem; }
-            main { padding: 1rem; }
+        /* Story Navigator (new in sidebar) */
+        .story-tree { list-style: none; padding-left: 0; }
+        .story-tree ul { list-style: none; padding-left: 1rem; border-left: 1px dashed var(--border-color); margin-left: 0.5rem; }
+        .tree-node { padding: 0.5rem; cursor: pointer; transition: background-color 0.2s, color 0.2s; border-radius: 6px; }
+        .tree-node:hover { background-color: var(--bg-tertiary); }
+        .tree-node.active { background-color: var(--accent-primary); color: #FFF; font-weight: 600; }
+
+        /* AI Chat Box (new in sidebar) */
+        .ai-chat-box {
+            height: 200px;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-primary);
+            padding: 0.75rem;
+            overflow-y: auto;
+            margin-bottom: 1rem;
+        }
+        .chat-msg {
+            margin-bottom: 0.75rem;
+            line-height: 1.4;
+        }
+        .chat-msg.user {
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+        .chat-msg.ai {
+            color: var(--text-primary);
+        }
+        .chat-msg-actions {
+            margin-top: 0.5rem;
+        }
+        .chat-msg-actions button {
+            font-size: 0.8rem;
+            padding: 0.25rem 0.5rem;
         }
 
+        /* Main Canvas (Chapter Editor) */
+        #main-canvas-editor {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+         #main-canvas {
+            flex-grow: 1;
+            height: 400px;
+            font-size: 1.1rem;
+            line-height: 1.7;
+            background-color: var(--bg-primary);
+        }
+        
+        /* Choice Editor */
+        #node-choices-editor {
+            margin-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+            padding-top: 1.5rem;
+        }
+        .choice-editor-item { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; }
+        .choice-editor-item input { flex-grow: 1; margin-bottom: 0; background: var(--bg-secondary); }
+        .choice-editor-item button { flex-shrink: 0; padding: 0.5rem; font-size: 0.8rem; height: 44px; }
     </style>
 </head>
 <body>
@@ -415,7 +503,7 @@
             
             <h2 style="margin-top: 2rem;">Your Creations</h2>
             <div class="story-library-grid" id="user-story-grid">
-                <!-- JS will fill this. This is now legacy. -->
+                <!-- JS will fill this -->
             </div>
         </div>
 
@@ -425,12 +513,11 @@
         <div id="creator-tab" class="tab-content">
             <div class="creator-layout">
                 
-                <!-- === Left Panel (Input) === -->
-                <aside class="creator-input-panel">
+                <!-- === Left Sidebar (Controls) === -->
+                <aside class="creator-sidebar">
                     
-                    <!-- Backend Status -->
                     <div class="panel-section">
-                        <h2>Backend Status</h2>
+                        <h3>Backend Status</h3>
                         <div style="display: flex; align-items: center; margin-bottom: 1rem;">
                             <span id="status-light" class="status-light"></span>
                             <span id="status-text">Offline</span>
@@ -438,44 +525,84 @@
                         <button id="connect-btn" class="btn-primary" style="width: 100%;">Connect</button>
                     </div>
 
-                    <!-- AI Controls -->
+                    <div class="panel-section">
+                        <h3>Story Manager</h3>
+                        <div class="button-group" style="flex-direction: column; gap: 0.75rem;">
+                            <button id="new-story-btn" class="btn-primary">Create New Story</button>
+                            <button id="import-btn" class="btn-secondary">Import Creations (.json)</button>
+                            <button id="export-btn" class="btn-secondary">Export Creations (.json)</button>
+                        </div>
+                    </div>
+                    
+                    <div class="panel-section">
+                        <h3>Story Navigator</h3>
+                        <div id="story-tree" class="story-tree">
+                            <p style="color: var(--text-secondary);">No story selected.</p>
+                        </div>
+                    </div>
+                    
                     <fieldset id="ai-controls" class="panel-section" disabled>
-                        <h2>AI Controls</h2>
+                        <h3>AI Assistant</h3>
                         
                         <label for="model-select">Model:</label>
                         <select id="model-select" disabled>
                             <option value="">-- Offline --</option>
                         </select>
                         
-                        <label for="ai-context-input">1. Story Context (Paste your story here)</label>
-                        <textarea id="ai-context-input" rows="8" placeholder="Paste the story so far..."></textarea>
-
-                        <label for="ai-prompt-input">2. Your Prompt (Instruction or Chat)</label>
-                        <textarea id="ai-prompt-input" rows="5" placeholder="e.g., 'Continue the story' or 'What if the hero finds a dragon?'"></textarea>
-                        
-                        <div class="button-group">
-                            <button id="ai-generate-btn" class="btn-primary">Generate</button>
-                            <button id="ai-regenerate-btn" class="btn-secondary">Regenerate</button>
+                        <label for="ai-chat-input">AI Plot Assistant (Chat)</label>
+                        <div class="ai-chat-box" id="ai-chat-box">
+                            <!-- AI chat messages go here -->
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <input type="text" id="ai-chat-input" placeholder="Ask for plot ideas..." style="margin-bottom: 0;">
+                            <button id="ai-chat-send" class="btn-primary" style="flex-shrink: 0;">Send</button>
                         </div>
                     </fieldset>
 
                 </aside>
 
-                <!-- === Right Panel (Output Canvas) === -->
-                <main class="creator-output-panel">
-                    <h2>AI Response</h2>
-                    <textarea id="ai-output-canvas" placeholder="AI-generated text will appear here..."></textarea>
+                <!-- === Right Canvas (Editor) === -->
+                <main id="main-canvas-editor" class="creator-main" style="display: none;">
+                    <h2>
+                        <span id="editor-node-title"></span>
+                        <button id="commit-changes-btn" class="btn-primary">Commit Changes</button>
+                    </h2>
                     
-                    <div class="button-group" style="margin-top: 1rem; justify-content: space-between;">
-                        <div>
-                            <button id="copy-text-btn" class="btn-secondary" title="Copy text to clipboard">Copy Text</button>
-                            <button id="add-to-context-btn" class="btn-secondary" title="Append this text to the context input">Add to Context</button>
+                    <label for="node-title-input">Chapter Title:</label>
+                    <input type="text" id="node-title-input" placeholder="e.g., Chapter 1: The Beginning">
+                    
+                    <label for="main-canvas">Chapter Content:</label>
+                    <textarea id="main-canvas" placeholder="Write your story here..."></textarea>
+
+                    <fieldset id="ai-gen-controls" class="panel-section" disabled>
+                        <h3>AI Content Generation</h3>
+                        <label for="ai-gen-instruction">Instruction (for this chapter):</label>
+                        <textarea id="ai-gen-instruction" rows="3" placeholder="e.g., 'Make this chapter longer' or 'Add a fight scene with the security drones.'"></textarea>
+                        
+                        <div class="button-group" style="justify-content: space-between;">
+                            <div>
+                                <button id="ai-generate-content-btn" class="btn-primary">Generate</button>
+                                <button id="ai-regenerate-content-btn" class="btn-secondary">Regenerate</button>
+                            </div>
+                            <div class="ai-feedback">
+                                <button id="ai-like-btn" title="Like response">👍</button>
+                                <button id="ai-dislike-btn" title="Dislike response">👎</button>
+                            </div>
                         </div>
-                        <div class="ai-feedback">
-                            <button id="ai-like-btn" title="Like response">👍</button>
-                            <button id="ai-dislike-btn" title="Dislike response">👎</button>
-                        </div>
+                    </fieldset>
+
+                    <div id="node-choices-editor">
+                        <h3>Story Branches (Choices)</h3>
+                        <!-- Choice editor fields go here -->
                     </div>
+                    <button id="add-choice-btn" class="btn-secondary" style="margin-top: 1rem;">+ Add New Choice</button>
+                </main>
+
+                <!-- Placeholder for when no story is selected -->
+                <main id="main-canvas-placeholder" class="creator-main" style="justify-content: center; align-items: center; text-align: center;">
+                    <h2 style="color: var(--text-secondary); border: none;">
+                        Select a story from the navigator, or create a new one to begin.
+                    </h2>
                 </main>
             </div>
         </div>
@@ -526,6 +653,7 @@
         </div>
     </div>
 
+
     <!-- ======================= -->
     <!-- ====== JAVASCRIPT ===== -->
     <!-- ======================= -->
@@ -534,15 +662,19 @@
 
             // --- STATE & CONSTANTS ---
             const API_URL = "https://fugthchat-fugthdes.hf.space";
-            const DB_KEY = "lunarith_user_stories_v4"; // Key for legacy user creations
+            const DB_KEY = "lunarith_user_stories_v4"; // Key for user's own creations
             
             let featuredStories = {}; // Stories from /stories/index.json
             let userStories = {};     // Stories from localStorage
             
+            let currentStoryId = null;
+            let currentNodeId = null;
+            let currentStoryIsFeatured = false; 
             let activeStoryData = null; // Caches the JSON of the currently open featured story
             
             let isBackendConnected = false;
-            let lastAiPrompt = ""; // For "Regenerate"
+            let aiChatHistory = []; // For the new AI Plot Assistant
+            let lastAiGenPrompt = ""; // For "Regenerate"
             
             let ttsUtterance;
             let ttsSentences = [];
@@ -573,43 +705,53 @@
             const ttsRateSlider = document.getElementById('tts-rate-slider');
             const ttsRateLabel = document.getElementById('tts-rate-label');
             
-            // Creator Tab
+            // Creator Sidebar
             const connectBtn = document.getElementById('connect-btn');
             const statusLight = document.getElementById('status-light');
             const statusText = document.getElementById('status-text');
-            const aiControls = document.getElementById('ai-controls');
-            const modelSelect = document.getElementById('model-select');
-            
-            // Creator: Input
-            const aiContextInput = document.getElementById('ai-context-input');
-            const aiPromptInput = document.getElementById('ai-prompt-input');
-            const aiGenerateBtn = document.getElementById('ai-generate-btn');
-            const aiRegenerateBtn = document.getElementById('ai-regenerate-btn');
-
-            // Creator: Output
-            const aiOutputCanvas = document.getElementById('ai-output-canvas');
-            const copyTextBtn = document.getElementById('copy-text-btn');
-            const addToContextBtn = document.getElementById('add-to-context-btn');
-            const aiLikeBtn = document.getElementById('ai-like-btn');
-            const aiDislikeBtn = document.getElementById('ai-dislike-btn');
-
-            // --- NOTE: Legacy Creator buttons ---
-            // These are no longer in the HTML, but we keep the selectors
-            // in case you want to add them back.
             const newStoryBtn = document.getElementById('new-story-btn');
             const importBtn = document.getElementById('import-btn');
             const exportBtn = document.getElementById('export-btn');
+            const storyTree = document.getElementById('story-tree');
+            
+            // AI Panel
+            const aiControls = document.getElementById('ai-controls');
+            const aiGenControls = document.getElementById('ai-gen-controls'); // The new panel
+            const modelSelect = document.getElementById('model-select');
+            const aiChatBox = document.getElementById('ai-chat-box');
+            const aiChatInput = document.getElementById('ai-chat-input');
+            const aiChatSendBtn = document.getElementById('ai-chat-send');
+            const aiGenInstruction = document.getElementById('ai-gen-instruction');
+            const aiGenerateContentBtn = document.getElementById('ai-generate-content-btn');
+            const aiRegenerateContentBtn = document.getElementById('ai-regenerate-content-btn');
+            const aiLikeBtn = document.getElementById('ai-like-btn');
+            const aiDislikeBtn = document.getElementById('ai-dislike-btn');
 
-
+            // Creator Main Canvas
+            const creatorMain = document.getElementById('main-canvas-editor');
+            const creatorPlaceholder = document.getElementById('main-canvas-placeholder');
+            const editorNodeTitle = document.getElementById('editor-node-title');
+            const nodeTitleInput = document.getElementById('node-title-input');
+            const mainCanvas = document.getElementById('main-canvas');
+            const nodeChoicesEditor = document.getElementById('node-choices-editor');
+            const addChoiceBtn = document.getElementById('add-choice-btn');
+            const commitChangesBtn = document.getElementById('commit-changes-btn');
+            const deleteNodeBtn = document.getElementById('delete-node-btn');
+            
             
             // --- CORE DATA FUNCTIONS ---
             
             function loadUserStories() {
-                // This function is kept for any legacy stories users may have.
                 try {
                     const data = localStorage.getItem(DB_KEY);
                     userStories = data ? JSON.parse(data) : {};
                 } catch (e) { console.error("Error loading user stories:", e); userStories = {}; }
+            }
+            
+            function saveUserStories() {
+                try {
+                    localStorage.setItem(DB_KEY, JSON.stringify(userStories));
+                } catch (e) { console.error("Error saving user stories:", e); alert("Error: Could not save data."); }
             }
             
             async function loadFeaturedStories() {
@@ -628,6 +770,10 @@
                 }
             }
 
+            function generateId(prefix = 'node') {
+                return `${prefix}_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+            }
+
             function switchTab(e) {
                 const targetTab = e.target.dataset.tab;
                 tabButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.tab === targetTab));
@@ -635,6 +781,9 @@
                 
                 if (targetTab === 'reader-tab') {
                     renderReaderLibrary();
+                } else if (targetTab === 'creator-tab') {
+                    renderCreatorList();
+                    if(currentStoryId && !currentStoryIsFeatured) renderStoryTree(currentStoryId);
                 }
             }
             
@@ -645,6 +794,7 @@
                 statusText.textContent = 'Connecting...';
                 connectBtn.disabled = true;
                 aiControls.disabled = true;
+                aiGenControls.disabled = true;
                 modelSelect.innerHTML = '<option value="">-- Connecting... --</option>';
                 
                 try {
@@ -659,8 +809,15 @@
                     statusLight.className = 'status-light connected';
                     statusText.textContent = `Connected (${data.model_loaded})`;
                     isBackendConnected = true;
-                    aiControls.disabled = false; // Enable the whole panel
-                    modelSelect.disabled = false; // Enable the selector
+                    aiControls.disabled = false; // Enable the chat panel
+                    modelSelect.disabled = false;
+                    
+                    // Re-check if editor should be enabled
+                    if(currentStoryId && !currentStoryIsFeatured) {
+                         setEditorDisabled(false); // This will also enable aiGenControls
+                    } else {
+                         setEditorDisabled(true); // Keep editor disabled
+                    }
                     
                     modelSelect.innerHTML = ''; 
                     if (data.models && data.models.length > 0) {
@@ -680,6 +837,7 @@
                     statusText.textContent = 'Connection Failed';
                     isBackendConnected = false;
                     aiControls.disabled = true;
+                    aiGenControls.disabled = true;
                     modelSelect.disabled = true;
                     modelSelect.innerHTML = '<option value="">-- Offline --</option>';
                 } finally {
@@ -854,22 +1012,32 @@
              * Removes the AI preamble from the story text.
              */
             function cleanAIResponse(text) {
-                // Regex to find "Here is Chapter X:" or similar patterns, case-insensitive
+                let cleanText = text.trim();
+                
+                // List of common preambles to remove
+                const preambles = [
+                    "here is chapter 1:",
+                    "here is the continuation:",
+                    "thank you for providing me with the context and instructions."
+                ];
+
+                // This regex finds a preamble, even if it's a few lines down
                 const regex = /^(?:.*\n)*?(here is chapter \d+:|here is the continuation:)/i;
-                let cleanText = text;
-                
                 const match = cleanText.match(regex);
-                if (match) {
-                    // Return only the text *after* the match
-                    cleanText = cleanText.substring(match[0].length).trim();
-                }
                 
-                // Also check for the "Thank you..." preamble
-                const preamble = "thank you for providing me with the context and instructions.";
-                if (cleanText.toLowerCase().trim().startsWith(preamble)) {
-                     cleanText = cleanText.substring(preamble.length).trim();
+                if (match) {
+                    cleanText = cleanText.substring(match[0].length).trim();
+                } else {
+                    // Fallback check for the "Thank you" preamble
+                    const preambleLower = "thank you for providing me with the context and instructions.";
+                    if (cleanText.toLowerCase().startsWith(preambleLower)) {
+                        cleanText = cleanText.substring(preambleLower.length).trim();
+                    }
                 }
 
+                // If the first line is just "Chapter X", remove it too.
+                cleanText = cleanText.replace(/^chapter \d+\n/i, '');
+                
                 return cleanText;
             }
 
@@ -951,54 +1119,340 @@
                 document.querySelectorAll('.tts-highlight').forEach(el => el.classList.remove('tts-highlight'));
             }
 
-            // --- CREATOR TAB FUNCTIONS (NEW, SIMPLIFIED) ---
+            // --- CREATOR TAB FUNCTIONS ---
 
-            /**
-             * Handles all calls to the AI backend.
-             * @param {string} mode - 'generate' or 'regenerate'
-             */
-            async function callAI(mode) {
-                if (!isBackendConnected) { 
-                    alert("Error: Backend is not connected."); 
-                    return; 
+            function renderCreatorList() {
+                const storyIds = Object.keys(userStories);
+                if (storyIds.length === 0) {
+                    storyTree.innerHTML = `<p style="color: var(--text-secondary);">No stories created yet.</p>`;
+                    return;
                 }
                 
-                let btnToDisable = (mode === 'regenerate') ? aiRegenerateBtn : aiGenerateBtn;
-                let finalAiPrompt;
-
-                if (mode === 'regenerate') {
-                    if (!lastAiPrompt) {
-                        alert("No previous prompt to regenerate.");
-                        return;
+                const ul = document.createElement('ul');
+                ul.className = 'story-tree';
+                
+                storyIds.forEach(storyId => {
+                    const story = userStories[storyId];
+                    const li = document.createElement('li');
+                    const div = document.createElement('div');
+                    div.className = 'tree-node';
+                    div.textContent = `📖 ${story.title}`;
+                    if (storyId === currentStoryId && !currentStoryIsFeatured) {
+                        div.classList.add('active');
                     }
-                    finalAiPrompt = lastAiPrompt;
+                    div.onclick = () => {
+                        currentStoryId = storyId;
+                        currentNodeId = 'root';
+                        currentStoryIsFeatured = false;
+                        renderStoryTree(storyId);
+                        loadNodeInEditor(storyId, 'root');
+                    };
+                    li.appendChild(div);
+                    ul.appendChild(li);
+                });
+                storyTree.innerHTML = '';
+                storyTree.appendChild(ul);
+                
+                if (currentStoryId && !currentStoryIsFeatured) {
+                    renderStoryTree(currentStoryId);
+                }
+            }
+            
+            function renderStoryTree(storyId) {
+                const story = userStories[storyId];
+                if (!story) return;
+                
+                const storyNodes = storyTree.querySelectorAll('.story-tree > li > .tree-node');
+                let activeStoryLi = null;
+                storyNodes.forEach(n => {
+                    if (n.textContent === `📖 ${story.title}`) {
+                        activeStoryLi = n.parentElement;
+                        n.classList.add('active');
+                    } else { n.classList.remove('active'); }
+                });
+
+                if (!activeStoryLi) return;
+                
+                const oldTree = activeStoryLi.querySelector('ul');
+                if (oldTree) oldTree.remove();
+                
+                const ul = document.createElement('ul');
+                function buildTreeHtml(nodeId) {
+                    const node = story.nodes[nodeId];
+                    if (!node) return;
+                    
+                    const li = document.createElement('li');
+                    const div = document.createElement('div');
+                    div.className = 'tree-node';
+                    div.textContent = node.title || "Untitled Node";
+                    div.dataset.nodeId = nodeId;
+                    if (nodeId === currentNodeId) { div.classList.add('active'); }
+                    
+                    div.onclick = (e) => { e.stopPropagation(); loadNodeInEditor(storyId, nodeId); };
+                    li.appendChild(div);
+                    
+                    if (node.choices && node.choices.length > 0) {
+                        const nestedUl = document.createElement('ul');
+                        node.choices.forEach(choice => {
+                            if (userStories[storyId].nodes[choice.targetNodeId]) {
+                                nestedUl.appendChild(buildTreeHtml(choice.targetNodeId));
+                            }
+                        });
+                        li.appendChild(nestedUl);
+                    }
+                    return li;
+                }
+                ul.appendChild(buildTreeHtml('root'));
+                activeStoryLi.appendChild(ul);
+            }
+            
+            function createNewStory() {
+                const title = prompt("Enter new story title:", "My New Story");
+                if (!title) return;
+                const author = "Me";
+                
+                const storyId = generateId('story');
+                userStories[storyId] = {
+                    title,
+                    author,
+                    cover: `https://placehold.co/300x450/${Math.floor(Math.random()*16777215).toString(16)}/FFFFFF?text=${encodeURIComponent(title)}`,
+                    nodes: {
+                        "root": { title: "Chapter 1", content: "...", choices: [] }
+                    }
+                };
+                
+                saveUserStories();
+                currentStoryId = storyId;
+                currentNodeId = 'root';
+                currentStoryIsFeatured = false;
+                renderCreatorList();
+                loadNodeInEditor(storyId, 'root');
+            }
+            
+            function setEditorDisabled(disabled) {
+                if (disabled) {
+                    creatorMain.style.display = 'none';
+                    creatorPlaceholder.style.display = 'flex';
                 } else {
-                    const context = aiContextInput.value;
-                    const prompt = aiPromptInput.value;
-                    if (!prompt) {
-                        alert("Please enter a prompt or instruction.");
-                        return;
+                    creatorMain.style.display = 'flex';
+                    creatorPlaceholder.style.display = 'none';
+                }
+                
+                // Only change AI controls if backend is connected
+                if(isBackendConnected) { 
+                    aiControls.disabled = false; // Chat is always enabled if connected
+                    aiGenControls.disabled = disabled; // Gen panel is disabled if no node is selected
+                } else {
+                    aiControls.disabled = true; // Both disabled if not connected
+                    aiGenControls.disabled = true;
+                }
+            }
+
+            function loadNodeInEditor(storyId, nodeId) {
+                if (!storyId || !userStories[storyId]) {
+                    setEditorDisabled(true);
+                    return;
+                }
+                
+                setEditorDisabled(false);
+                currentStoryId = storyId;
+                currentNodeId = nodeId;
+                currentStoryIsFeatured = false;
+                
+                const node = userStories[storyId].nodes[nodeId];
+                if (!node) return;
+                
+                editorNodeTitle.textContent = `Editing: ${node.title}`;
+                nodeTitleInput.value = node.title;
+                mainCanvas.value = node.content;
+                
+                document.querySelectorAll('.story-tree .tree-node.active').forEach(n => n.classList.remove('active'));
+                const treeNode = document.querySelector(`.tree-node[data-node-id="${nodeId}"]`);
+                if (treeNode) treeNode.classList.add('active');
+                
+                renderNodeChoicesEditor(storyId, nodeId);
+                deleteNodeBtnCached.disabled = (nodeId === 'root');
+            }
+            
+            function saveNode() {
+                if (!currentStoryId || !currentNodeId || currentStoryIsFeatured) {
+                    alert("Cannot save. No user story chapter is selected."); return;
+                }
+                
+                const story = userStories[currentStoryId];
+                const node = story.nodes[currentNodeId];
+                
+                node.title = nodeTitleInput.value || "Untitled Node";
+                node.content = mainCanvas.value;
+                
+                const choiceInputs = nodeChoicesEditor.querySelectorAll('.choice-editor-item input');
+                node.choices = node.choices.map((choice, index) => ({
+                    ...choice,
+                    text: choiceInputs[index].value || "..."
+                }));
+                
+                saveUserStories();
+                editorNodeTitle.textContent = `Editing: ${node.title}`;
+                renderStoryTree(currentStoryId);
+                alert("Chapter changes committed!");
+            }
+            
+            function renderNodeChoicesEditor(storyId, nodeId) {
+                const node = userStories[storyId].nodes[nodeId];
+                nodeChoicesEditor.innerHTML = '<h3>Story Branches (Choices)</h3>';
+                
+                if (!node.choices || node.choices.length === 0) {
+                    nodeChoicesEditor.innerHTML += `<p style="color: var(--text-secondary);">No choices for this chapter yet.</p>`;
+                    return;
+                }
+                
+                node.choices.forEach((choice, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'choice-editor-item';
+                    
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.value = choice.text;
+                    input.placeholder = `Choice ${index + 1} text...`;
+                    
+                    const gotoBtn = document.createElement('button');
+                    gotoBtn.className = 'btn-secondary';
+                    gotoBtn.textContent = 'Edit ➔';
+                    gotoBtn.title = `Go to chapter: ${userStories[storyId].nodes[choice.targetNodeId]?.title}`;
+                    gotoBtn.onclick = () => loadNodeInEditor(storyId, choice.targetNodeId);
+                    
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'btn-danger';
+                    deleteBtn.textContent = 'X';
+                    deleteBtn.title = 'Remove this choice and delete its branch';
+                    deleteBtn.onclick = () => deleteChoiceAndBranch(storyId, nodeId, choice.targetNodeId);
+                    
+                    div.appendChild(input);
+                    div.appendChild(gotoBtn);
+                    div.appendChild(deleteBtn);
+                    nodeChoicesEditor.appendChild(div);
+                });
+            }
+            
+            function addNewChoice() {
+                if (!currentStoryId || !currentNodeId || currentStoryIsFeatured) {
+                    alert("Please select a user story chapter first."); return;
+                }
+                
+                const choiceText = prompt("Enter text for this new choice:", "...");
+                if (!choiceText) return;
+                
+                const story = userStories[currentStoryId];
+                const newNodeId = generateId();
+                story.nodes[newNodeId] = { title: choiceText, content: "", choices: [] };
+                story.nodes[currentNodeId].choices.push({
+                    text: choiceText,
+                    targetNodeId: newNodeId
+                });
+                
+                saveUserStories();
+                renderStoryTree(currentStoryId);
+                renderNodeChoicesEditor(currentStoryId, currentNodeId);
+            }
+            
+            function deleteChoiceAndBranch(storyId, parentNodeId, targetNodeId) {
+                if (targetNodeId === 'root') return;
+                if (!confirm("Are you sure? This will delete this choice and ALL chapters that follow it.")) return;
+                
+                const story = userStories[storyId];
+                const parentNode = story.nodes[parentNodeId];
+                parentNode.choices = parentNode.choices.filter(c => c.targetNodeId !== targetNodeId);
+                
+                const nodesToDelete = [targetNodeId];
+                let i = 0;
+                while (i < nodesToDelete.length) {
+                    const nodeId = nodesToDelete[i];
+                    const node = story.nodes[nodeId];
+                    if (node && node.choices) {
+                        node.choices.forEach(c => nodesToDelete.push(c.targetNodeId));
                     }
-                    
-                    // This is the new prompt format that fixes the bug
-                    finalAiPrompt = `Here is the story so far:
-${context}
+                    delete story.nodes[nodeId];
+                    i++;
+                }
+                
+                saveUserStories();
+                renderStoryTree(storyId);
+                renderNodeChoicesEditor(storyId, parentNodeId);
+            }
 
-Here is my instruction:
-${prompt}
-
-Generate the next part of the story:`;
-                    
-                    lastAiPrompt = finalAiPrompt; // Save for regeneration
+            function deleteCurrentNode() {
+                if (!currentStoryId || !currentNodeId || currentNodeId === 'root' || currentStoryIsFeatured) {
+                    alert("Cannot delete the root chapter or a featured story node."); return;
                 }
 
+                const story = userStories[currentStoryId];
+                const parentId = Object.keys(story.nodes).find(id => 
+                    story.nodes[id].choices.some(c => c.targetNodeId === currentNodeId)
+                );
+
+                if (parentId) {
+                    deleteChoiceAndBranch(currentStoryId, parentId, currentNodeId);
+                    loadNodeInEditor(currentStoryId, parentId);
+                } else {
+                    alert("Error: Could not find parent node. Cannot delete.");
+                }
+            }
+
+            // --- AI GENERATION ---
+            
+            async function callAI(mode) {
+                if (!isBackendConnected) { alert("Error: Backend is not connected."); return; }
+                
                 const model = modelSelect.value;
-                const originalBtnText = btnToDisable.textContent;
+                let finalAiPrompt, btnToDisable, originalBtnText;
+
+                if (mode === 'chat') {
+                    const prompt = aiChatInput.value;
+                    if (!prompt) return;
+                    btnToDisable = aiChatSendBtn;
+                    originalBtnText = btnToDisable.textContent;
+                    addMessageToChat('user', prompt);
+                    aiChatInput.value = '';
+
+                    let chatHistoryStr = aiChatHistory.map(msg => `${msg.role}: ${msg.content}`).join('\n');
+                    finalAiPrompt = `You are a helpful plot assistant. The user is writing a story. Help them brainstorm.\n\n${chatHistoryStr}\n\nuser: ${prompt}\nassistant:`;
+                    lastAiGenPrompt = finalAiPrompt; // Save for regenerate
+
+                } else { // 'generate_content' or 'regenerate'
+                    if (!currentStoryId || !currentNodeId || currentStoryIsFeatured) {
+                        alert("Error: Please select one of your story chapters to edit."); return;
+                    }
+                    const story = userStories[currentStoryId];
+                    const node = story.nodes[currentNodeId];
+                    
+                    if (mode === 'regenerate') {
+                        finalAiPrompt = lastAiGenPrompt;
+                        if (!finalAiPrompt) {
+                            alert("No previous generation to regenerate."); return;
+                        }
+                        btnToDisable = aiRegenerateContentBtn;
+                    } else { // 'generate_content'
+                        const instruction = aiGenInstruction.value;
+                        let story_memory = "";
+                        activeStoryData = story;
+                        const path = getBreadcrumbPath(currentNodeId);
+                        path.slice(0, -1).forEach(step => {
+                            const parentNode = story.nodes[step.id];
+                            if (parentNode) {
+                                story_memory += `Chapter: ${parentNode.title}\n${parentNode.content}\n\n`;
+                            }
+                        });
+                        
+                        finalAiPrompt = `Here is the story so far:\n${story_memory}\n\nMy instruction is: ${instruction || 'Continue the story'}\n\nGenerate the *full text* for the chapter titled "${node.title}":`;
+                        lastAiGenPrompt = finalAiPrompt; // Save for regenerate
+                        btnToDisable = aiGenerateContentBtn;
+                    }
+                    originalBtnText = btnToDisable.textContent;
+                }
+                
                 btnToDisable.disabled = true;
-                aiGenerateBtn.disabled = true;
-                aiRegenerateBtn.disabled = true;
-                btnToDisable.textContent = 'Generating...';
-                aiOutputCanvas.value = "Generating response...";
+                btnToDisable.textContent = '...';
+                if (mode !== 'chat') aiRegenerateContentBtn.disabled = true;
 
                 try {
                     const response = await fetch(API_URL + "/generate", {
@@ -1007,34 +1461,118 @@ Generate the next part of the story:`;
                         body: JSON.stringify({
                             prompt: finalAiPrompt,
                             model_choice: model,
-                            // These are sent to match the Pydantic model
-                            feedback: "", 
-                            story_memory: "" 
+                            feedback: "", story_memory: "" // Not used by new backend, but sent
                         })
                     });
                     
                     const data = await response.json();
                     if (!response.ok) throw new Error(data.error || "Unknown server error");
                     
-                    // Clean the response *before* displaying it
                     const cleanResponse = cleanAIResponse(data.story_text);
-                    aiOutputCanvas.value = cleanResponse;
+                    
+                    if (mode === 'chat') {
+                        addMessageToChat('ai', cleanResponse);
+                    } else {
+                        mainCanvas.value = cleanResponse;
+                        saveNode(); // Auto-commit
+                    }
                     
                 } catch (err) {
                     console.error("AI Generation Error:", err);
-                    aiOutputCanvas.value = `Error: ${err.message}`;
+                    if (mode === 'chat') {
+                        addMessageToChat('system', `Error: ${err.message}`);
+                    } else {
+                        alert(`Error: ${err.message}`);
+                    }
                 } finally {
                     btnToDisable.disabled = false;
-                    aiGenerateBtn.disabled = false;
-                    aiRegenerateBtn.disabled = false;
                     btnToDisable.textContent = originalBtnText;
+                    if (mode !== 'chat') aiRegenerateContentBtn.disabled = false;
                 }
             }
             
-            function copyOutputToClipboard() {
-                aiOutputCanvas.select();
-                document.execCommand('copy');
-                alert("AI response copied to clipboard. You can now save this as a .json file.");
+            function addMessageToChat(role, content) {
+                const msg = { role, content };
+                if (role !== 'system') {
+                    aiChatHistory.push(msg);
+                }
+                
+                const msgDiv = document.createElement('div');
+                msgDiv.className = `chat-msg ${role}`;
+                msgDiv.innerHTML = `<strong>${role.toUpperCase()}:</strong> ${content.replace(/\n/g, '<br>')}`;
+                
+                if (role === 'ai') {
+                    const actionsDiv = document.createElement('div');
+                    actionsDiv.className = 'chat-msg-actions';
+                    
+                    const addBtn = document.createElement('button');
+                    addBtn.className = 'btn-secondary';
+                    addBtn.textContent = 'Add to Story';
+                    addBtn.onclick = () => {
+                        if (currentStoryId && currentNodeId && !currentStoryIsFeatured) {
+                            mainCanvas.value += `\n\n${content}`;
+                            saveNode();
+                        } else {
+                            alert("Please select a story chapter to add this text to.");
+                        }
+                    };
+                    actionsDiv.appendChild(addBtn);
+                    msgDiv.appendChild(actionsDiv);
+                }
+                
+                aiChatBox.appendChild(msgDiv);
+                aiChatBox.scrollTop = aiChatBox.scrollHeight;
+            }
+
+            // --- DATA IMPORT/EXPORT ---
+            
+            function exportData() {
+                if (Object.keys(userStories).length === 0) {
+                    alert("No creations to export."); return;
+                }
+                if (!confirm("This will export your *local creations* library as a JSON file. You can use this file to import later or to manually add to your 'stories/' folder on GitHub.")) return;
+                try {
+                    const data = JSON.stringify(userStories, null, 2);
+                    const blob = new Blob([data], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'lunarith_creations_backup.json';
+                    a.click();
+                    URL.revokeObjectURL(url);
+                } catch (err) { alert("Error exporting data: " + err.message); }
+            }
+            
+            function importData() {
+                if (!confirm("WARNING: This will *replace* all your local creations with the data from the file. This cannot be undone.")) return;
+                
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = '.json,application/json';
+                input.onchange = (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        try {
+                            const data = JSON.parse(event.target.result);
+                            if (typeof data !== 'object' || Array.isArray(data)) {
+                                throw new Error("Invalid file format.");
+                            }
+                            userStories = data;
+                            saveUserStories();
+                            currentStoryId = null;
+                            currentNodeId = null;
+                            setEditorDisabled(true);
+                            renderReaderLibrary();
+                            renderCreatorList();
+                            alert("Import successful!");
+                        } catch (err) { alert("Error importing file: " + err.message); }
+                    };
+                    reader.readAsText(file);
+                };
+                input.click();
             }
 
             // --- INITIALIZE ---
@@ -1047,22 +1585,30 @@ Generate the next part of the story:`;
                 // Reader
                 readerCloseBtn.addEventListener('click', closeReader);
                 initTTS();
-
-                // Creator
-                aiGenerateBtn.addEventListener('click', () => callAI('generate'));
-                aiRegenerateBtn.addEventListener('click', () => callAI('regenerate'));
-                aiLikeBtn.addEventListener('click', () => console.log("AI Feedback: LIKE"));
-                aiDislikeBtn.addEventListener('click', () => console.log("AI Feedback: DISLIKE"));
-                copyTextBtn.addEventListener('click', copyOutputToClipboard);
                 
-                addToContextBtn.addEventListener('click', () => {
-                    const output = aiOutputCanvas.value;
-                    if (output && output !== "Generating response...") {
-                        aiContextInput.value += `\n\n${output}`;
-                        aiOutputCanvas.value = "";
-                        aiPromptInput.value = "";
+                // Creator Sidebar
+                newStoryBtn.addEventListener('click', createNewStory);
+                importBtn.addEventListener('click', importData);
+Next,
+                exportBtn.addEventListener('click', exportData);
+                
+                // Creator Main Canvas
+                commitChangesBtn.addEventListener('click', saveNode);
+                addChoiceBtn.addEventListener('click', addNewChoice);
+                deleteNodeBtn.addEventListener('click', deleteCurrentNode);
+                
+                // AI
+                aiChatSendBtn.addEventListener('click', () => callAI('chat'));
+                aiChatInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        callAI('chat');
                     }
                 });
+                aiGenerateContentBtn.addEventListener('click', () => callAI('generate_content'));
+                aiRegenerateContentBtn.addEventListener('click', () => callAI('regenerate'));
+                aiLikeBtn.addEventListener('click', () => console.log("AI Feedback: LIKE"));
+                aiDislikeBtn.addEventListener('click', () => console.log("AI Feedback: DISLIKE"));
 
                 // Load data
                 loadUserStories(); // For legacy stories
@@ -1070,6 +1616,7 @@ Generate the next part of the story:`;
                 
                 // Render initial views
                 renderReaderLibrary();
+                setEditorDisabled(true); // Editor is disabled by default
                 
                 // Auto-connect
                 checkBackendStatus();
