@@ -396,7 +396,7 @@
             color: var(--accent-primary);
         }
         
-        /* --- TTS Player --- */
+        /* --- TTS Player (Shared styles) --- */
         .tts-player {
             background-color: var(--bg-secondary);
             padding: 1rem;
@@ -421,10 +421,7 @@
         }
         
         .creator-input-panel {
-            padding: 1.5rem;
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius);
-            background-color: var(--bg-secondary);
+            /* Now just a simple container */
         }
         
         .creator-output-panel {
@@ -579,6 +576,7 @@
                 
                 <div class="creator-layout">
                     <aside class="creator-input-panel">
+                        
                         <fieldset id="ai-controls" class="panel-section" disabled>
                             <h3>AI Controls</h3>
                             
@@ -598,6 +596,33 @@
                                 <button id="ai-regenerate-btn" class="btn-secondary">Regenerate</button>
                             </div>
                         </fieldset>
+
+                        <div class="panel-section">
+                            <h3>Save Creation</h3>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem;">
+                                This saves your "Story Context" as a new story in your local library.
+                            </p>
+                            <button id="save-to-library-btn" class="btn-primary" style="width: 100%;">Save to My Library</button>
+                        </div>
+
+                        <div class="panel-section">
+                            <h3>Text-to-Speech</h3>
+                            <div class="tts-setting">
+                                <label for="tts-voice-select-creator">Voice:</label>
+                                <select id="tts-voice-select-creator"></select>
+                            </div>
+                            <div class="tts-setting" style="margin-top: 1rem;">
+                                <label for="tts-rate-slider-creator">Speed: <span id="tts-rate-label-creator">1x</span></label>
+                                <input type="range" id="tts-rate-slider-creator" min="0.5" max="2" value="1" step="0.1" style="margin-bottom: 0;">
+                            </div>
+                            <div class="button-group" style="margin-top: 1.5rem; flex-direction: column;">
+                                <button id="tts-play-context" class="btn-secondary">Play Context</button>
+                                <button id="tts-play-response" class="btn-secondary">Play Response</button>
+                                <button id="tts-stop-creator" class="btn-secondary">Stop</button>
+                            </div>
+                            <span id="tts-status-creator" class="tts-status" style="margin-top: 1rem; display: block;">Idle</span>
+                        </div>
+
                     </aside>
 
                     <main class="creator-output-panel">
@@ -620,10 +645,13 @@
 
             <div id="page-library" class="page-content">
                 <h1>Story Library</h1>
-                <p style="font-size: 1.1rem; color: var(--text-secondary); max-width: 600px; margin-bottom: 2rem;">
-                    Browse all available stories. This will include featured stories and, in the future, your own published creations.
-                </p>
-                <div class="story-library-grid" id="user-story-grid">
+                
+                <h2 style="color: var(--accent-primary); border-bottom-color: var(--accent-primary);">My Creations</h2>
+                <div class="story-library-grid" id="my-creations-grid">
+                    </div>
+
+                <h2 style="margin-top: 2rem;">Featured Library</h2>
+                <div class="story-library-grid" id="library-featured-grid">
                     </div>
             </div>
 
@@ -702,8 +730,8 @@
 
             // --- STATE & CONSTANTS ---
             const API_URL = "https://fugthchat-fugthdes.hf.space";
-            const DB_KEY = "lunarith_user_stories_v4"; // Key for legacy user creations
-            const LOCAL_CONTEXT_KEY = "lunarith_dev_context"; // Key for the simple text canvas
+            const DB_KEY = "fugth_ai_user_stories_v1"; // UPDATED KEY
+            const LOCAL_CONTEXT_KEY = "lunarith_dev_context"; 
             
             let featuredStories = {}; // Stories from /stories/index.json
             let userStories = {};     // Stories from localStorage
@@ -728,7 +756,8 @@
             const pages = document.querySelectorAll('.page-content');
 
             const featuredStoryGrid = document.getElementById('featured-story-grid');
-            const userStoryGrid = document.getElementById('user-story-grid');
+            const myCreationsGrid = document.getElementById('my-creations-grid'); // NEW
+            const libraryFeaturedGrid = document.getElementById('library-featured-grid'); // NEW
             const toast = document.getElementById('toast-notification');
             
             // Reader Modal
@@ -739,7 +768,7 @@
             const readerTextContent = document.getElementById('reader-text-content');
             const readerChoices = document.getElementById('reader-choices');
             
-            // TTS
+            // TTS (Modal)
             const ttsPlayBtn = document.getElementById('tts-play');
             const ttsPauseBtn = document.getElementById('tts-pause');
             const ttsStopBtn = document.getElementById('tts-stop');
@@ -748,25 +777,33 @@
             const ttsRateSlider = document.getElementById('tts-rate-slider');
             const ttsRateLabel = document.getElementById('tts-rate-label');
             
-            // Creator Tab (Selectors are global, so they still work)
+            // TTS (Creator) - NEW
+            const ttsVoiceSelectCreator = document.getElementById('tts-voice-select-creator');
+            const ttsRateSliderCreator = document.getElementById('tts-rate-slider-creator');
+            const ttsRateLabelCreator = document.getElementById('tts-rate-label-creator');
+            const ttsPlayContextBtn = document.getElementById('tts-play-context');
+            const ttsPlayResponseBtn = document.getElementById('tts-play-response');
+            const ttsStopCreatorBtn = document.getElementById('tts-stop-creator');
+            const ttsStatusCreator = document.getElementById('tts-status-creator');
+            
+            // Backend Status
             const connectBtn = document.getElementById('connect-btn');
             const statusLight = document.getElementById('status-light');
             const statusText = document.getElementById('status-text');
+            
+            // Creator
             const aiControls = document.getElementById('ai-controls');
             const modelSelect = document.getElementById('model-select');
-            
-            // Creator: Input
             const aiContextInput = document.getElementById('ai-context-input');
             const aiPromptInput = document.getElementById('ai-prompt-input');
             const aiGenerateBtn = document.getElementById('ai-generate-btn');
             const aiRegenerateBtn = document.getElementById('ai-regenerate-btn');
-
-            // Creator: Output
             const aiOutputCanvas = document.getElementById('ai-output-canvas');
             const copyTextBtn = document.getElementById('copy-text-btn');
             const addToContextBtn = document.getElementById('add-to-context-btn');
             const aiLikeBtn = document.getElementById('ai-like-btn');
             const aiDislikeBtn = document.getElementById('ai-dislike-btn');
+            const saveToLibraryBtn = document.getElementById('save-to-library-btn'); // NEW
             
             // Settings Page
             const saveLocalBtn = document.getElementById('save-local-btn');
@@ -775,14 +812,11 @@
 
             // --- TOAST NOTIFICATION FUNCTION ---
             function showToast(message, type = 'success') {
-                if (toastTimer) clearTimeout(toastTimer); // Clear any existing timer
-
+                if (toastTimer) clearTimeout(toastTimer); 
                 toast.textContent = message;
-                toast.className = ''; // Reset classes
-                toast.classList.add(type); // Add 'success' or 'error'
+                toast.className = ''; 
+                toast.classList.add(type); 
                 toast.classList.add('show');
-
-                // Hide after 3 seconds
                 toastTimer = setTimeout(() => {
                     toast.classList.remove('show');
                 }, 3000);
@@ -790,26 +824,20 @@
             
             // --- NEW NAVIGATION LOGIC ---
             function showPage(pageId) {
-                // Hide all pages
                 pages.forEach(page => page.classList.remove('active'));
-                
-                // Show the target page
                 const targetPage = document.getElementById(`page-${pageId}`);
                 if (targetPage) {
                     targetPage.classList.add('active');
                 }
-                
-                // Update active state for nav links
                 navLinks.forEach(link => {
                     link.classList.toggle('active', link.dataset.page === pageId);
                 });
                 
-                // Special case: re-render library on library tab
+                // Re-render libraries when visiting home or library
                 if (pageId === 'library' || pageId === 'home') {
                     renderReaderLibrary();
                 }
                 
-                // Close mobile menu on selection
                 if (window.innerWidth <= 768) {
                     closeMobileMenu();
                 }
@@ -839,7 +867,6 @@
                     const response = await fetch('stories/index.json?t=' + Date.now()); // Cache-bust
                     if (!response.ok) throw new Error('Failed to load stories/index.json. Create this file in your repo.');
                     const index = await response.json();
-                    
                     featuredStories = index.reduce((acc, story) => {
                         acc[story.id] = story;
                         return acc;
@@ -851,7 +878,6 @@
             }
             
             // --- BACKEND CONNECTION ---
-            
             async function checkBackendStatus() {
                 statusLight.className = 'status-light connecting';
                 statusText.textContent = 'Connecting...';
@@ -871,14 +897,15 @@
                     statusLight.className = 'status-light connected';
                     statusText.textContent = `Connected (${data.model_loaded})`;
                     isBackendConnected = true;
-                    aiControls.disabled = false; // Enable the whole panel
-                    modelSelect.disabled = false; // Enable the selector
+                    aiControls.disabled = false;
+                    modelSelect.disabled = false;
                     
                     modelSelect.innerHTML = ''; 
                     if (data.models && data.models.length > 0) {
                         data.models.forEach(modelName => {
                             const option = document.createElement('option');
                             option.value = modelName;
+                            // Capitalize first letter
                             option.textContent = modelName.charAt(0).toUpperCase() + modelName.slice(1);
                             modelSelect.appendChild(option);
                         });
@@ -902,7 +929,7 @@
             // --- READER TAB & VIEW ---
             
             function renderReaderLibrary() {
-                // Render Featured Stories (on Home)
+                // Render Featured Stories (on Home Page)
                 featuredStoryGrid.innerHTML = '';
                 const featuredStoryIds = Object.keys(featuredStories);
                 if (featuredStoryIds.length === 0) {
@@ -915,21 +942,30 @@
                     });
                 }
                 
-                // Render All Stories (on Library page)
-                // For now, it just shows featured. In future, you could merge local stories
-                userStoryGrid.innerHTML = '';
-                if (featuredStoryIds.length === 0) {
-                    userStoryGrid.innerHTML = `<p style="color: var(--text-secondary);">No stories found.</p>`;
+                // Render "My Creations" (on Library Page)
+                myCreationsGrid.innerHTML = '';
+                const userStoryIds = Object.keys(userStories);
+                if (userStoryIds.length === 0) {
+                    myCreationsGrid.innerHTML = `<p style="color: var(--text-secondary);">You haven't saved any creations yet. Use the "Save to My Library" button in the Creator!</p>`;
                 } else {
-                    featuredStoryIds.forEach(storyId => {
-                        const story = featuredStories[storyId];
-                        const card = createStoryCard(storyId, story, true);
-                        userStoryGrid.appendChild(card.cloneNode(true)); // Clone to avoid moving
+                    userStoryIds.forEach(storyId => {
+                        const story = userStories[storyId];
+                        const card = createStoryCard(storyId, story, false); // false = not featured
+                        myCreationsGrid.appendChild(card);
                     });
-                    
-                    // Add event listeners to cloned cards
-                    userStoryGrid.querySelectorAll('.story-card').forEach(card => {
-                        // Find original storyId from the title
+                }
+
+                // Render Featured Library (on Library Page)
+                libraryFeaturedGrid.innerHTML = '';
+                if (featuredStoryIds.length === 0) {
+                    libraryFeaturedGrid.innerHTML = `<p style="color: var(--text-secondary);">No featured stories found.</p>`;
+                } else {
+                    // We can't move the nodes, so we clone them
+                    featuredStoryGrid.childNodes.forEach(node => {
+                        libraryFeaturedGrid.appendChild(node.cloneNode(true));
+                    });
+                    // Re-attach event listeners to clones
+                    libraryFeaturedGrid.querySelectorAll('.story-card').forEach(card => {
                         const title = card.querySelector('.story-card-title').textContent;
                         const storyId = Object.keys(featuredStories).find(id => featuredStories[id].title === title);
                         if(storyId) {
@@ -942,7 +978,9 @@
             function createStoryCard(storyId, story, isFeatured) {
                 const card = document.createElement('div');
                 card.className = 'story-card';
-                const coverImg = story.cover || `https://placehold.co/300x450/${isFeatured ? '3182CE' : '2B6CB0'}/FFFFFF?text=${encodeURIComponent(story.title)}`;
+                // Use a different color for user creations
+                const placeholderColor = isFeatured ? '3182CE' : '48BB78'; // Blue vs Green
+                const coverImg = story.cover || `https://placehold.co/300x450/${placeholderColor}/FFFFFF?text=${encodeURIComponent(story.title)}`;
                 card.innerHTML = `
                     <img class="story-card-cover" src="${coverImg}" alt="Cover for ${story.title}">
                     <div class="story-card-content">
@@ -955,7 +993,7 @@
             }
             
             async function openReader(storyId, nodeId, isFeatured) {
-                stopTTS();
+                stopTTS(); // Stop any active speech
                 
                 let storyData;
                 if (isFeatured) {
@@ -973,7 +1011,8 @@
                         return;
                     }
                 } else {
-                    storyData = userStories[storyId]; // Load from legacy local storage
+                    // Load from user's local storage
+                    storyData = userStories[storyId]; 
                     activeStoryData = storyData;
                 }
                 
@@ -998,7 +1037,7 @@
                     path.unshift({ id: currentId, title: node.title });
                     
                     const parentId = Object.keys(activeStoryData.nodes).find(id => 
-                        activeStoryData.nodes[id].choices.some(c => c.targetNodeId === currentId)
+                        activeStoryData.nodes[id].choices?.some(c => c.targetNodeId === currentId)
                     );
                     currentId = parentId;
                 }
@@ -1017,6 +1056,7 @@
                 
                 readerTitle.textContent = activeStoryData.title;
                 
+                // Render Breadcrumbs
                 readerBreadcrumbs.innerHTML = '';
                 const path = getBreadcrumbPath(nodeId);
                 path.forEach((step, index) => {
@@ -1036,7 +1076,7 @@
                 
                 const paragraphs = cleanContent.split('\n');
                 readerTextContent.innerHTML = '';
-                ttsSentences = [];
+                ttsSentences = []; // Reset sentences for TTS
                 
                 paragraphs.forEach(p_text => {
                     const p = document.createElement('p');
@@ -1055,6 +1095,7 @@
                     readerTextContent.appendChild(p);
                 });
 
+                // Render Choices
                 readerChoices.innerHTML = '<h3>What happens next?</h3>';
                 if (node.choices && node.choices.length > 0) {
                     node.choices.forEach(choice => {
@@ -1085,33 +1126,52 @@
 
             // --- TEXT-TO-SPEECH (TTS) ---
             
+            // Refactored to populate any select element
+            function populateVoices(selectElement) {
+                if (!selectElement) return;
+                voices = synth.getVoices().filter(v => v.lang.startsWith('en'));
+                selectElement.innerHTML = '';
+                voices.forEach(voice => {
+                    const option = document.createElement('option');
+                    option.textContent = `${voice.name} (${voice.lang})`;
+                    option.setAttribute('data-name', voice.name);
+                    selectElement.appendChild(option);
+                });
+            }
+
             function initTTS() {
-                function populateVoices() {
-                    voices = synth.getVoices().filter(v => v.lang.startsWith('en'));
-                    ttsVoiceSelect.innerHTML = '';
-                    voices.forEach(voice => {
-                        const option = document.createElement('option');
-                        option.textContent = `${voice.name} (${voice.lang})`;
-                        option.setAttribute('data-name', voice.name);
-                        ttsVoiceSelect.appendChild(option);
-                    });
-                }
-                populateVoices();
+                // Populate both voice selects
+                populateVoices(ttsVoiceSelect);
+                populateVoices(ttsVoiceSelectCreator);
                 if (synth.onvoiceschanged !== undefined) {
-                    synth.onvoiceschanged = populateVoices;
+                    synth.onvoiceschanged = () => {
+                        populateVoices(ttsVoiceSelect);
+                        populateVoices(ttsVoiceSelectCreator);
+                    };
                 }
                 
-                ttsPlayBtn.onclick = playTTS;
+                // Reader Modal Listeners
+                ttsPlayBtn.onclick = playReaderTTS;
                 ttsPauseBtn.onclick = pauseTTS;
                 ttsStopBtn.onclick = stopTTS;
                 ttsRateSlider.oninput = () => {
                     const rate = parseFloat(ttsRateSlider.value).toFixed(1);
                     ttsRateLabel.textContent = `${rate}x`;
-                    if (synth.speaking && !synth.paused) { stopTTS(); playTTS(); }
+                    // If speaking, restart to apply new rate
+                    if (synth.speaking && !synth.paused) { stopTTS(); playReaderTTS(); }
                 };
+
+                // Creator Page Listeners (NEW)
+                ttsRateSliderCreator.oninput = () => {
+                    const rate = parseFloat(ttsRateSliderCreator.value).toFixed(1);
+                    ttsRateLabelCreator.textContent = `${rate}x`;
+                };
+                ttsPlayContextBtn.onclick = () => speakCreatorText('context');
+                ttsPlayResponseBtn.onclick = () => speakCreatorText('response');
+                ttsStopCreatorBtn.onclick = stopTTS;
             }
 
-            function playTTS() {
+            function playReaderTTS() {
                 if (synth.paused) { synth.resume(); ttsStatus.textContent = 'Speaking...'; return; }
                 if (synth.speaking) return;
                 ttsCurrentSentenceIdx = 0;
@@ -1154,11 +1214,43 @@
                 if (synth.speaking) { synth.pause(); ttsStatus.textContent = 'Paused'; }
             }
             
+            // Universal Stop Function
             function stopTTS() {
                 synth.cancel();
                 ttsCurrentSentenceIdx = 0;
+                // Reset both status labels
                 ttsStatus.textContent = 'Idle';
+                ttsStatusCreator.textContent = 'Idle';
                 document.querySelectorAll('.tts-highlight').forEach(el => el.classList.remove('tts-highlight'));
+            }
+
+            // NEW: Speak text from Creator textareas
+            function speakCreatorText(type) {
+                stopTTS(); // Stop anything currently playing
+
+                const text = (type === 'context') ? aiContextInput.value : aiOutputCanvas.value;
+                if (!text || text.trim() === '') {
+                    showToast("Nothing to play.", "error");
+                    return;
+                }
+                
+                const utterance = new SpeechSynthesisUtterance(text);
+                
+                // Use the creator's voice and rate controls
+                const selectedVoiceName = ttsVoiceSelectCreator.selectedOptions[0]?.getAttribute('data-name');
+                if (selectedVoiceName) {
+                    utterance.voice = voices.find(v => v.name === selectedVoiceName);
+                }
+                utterance.rate = parseFloat(ttsRateSliderCreator.value);
+
+                utterance.onstart = () => { ttsStatusCreator.textContent = 'Speaking...'; };
+                utterance.onend = () => { ttsStatusCreator.textContent = 'Idle'; };
+                utterance.onerror = (e) => { 
+                    console.error("TTS Error:", e);
+                    ttsStatusCreator.textContent = 'Error';
+                };
+
+                synth.speak(utterance);
             }
 
             // --- CREATOR TAB FUNCTIONS ---
@@ -1217,14 +1309,29 @@ Generate the next part of the story:`;
                     });
                     
                     const data = await response.json();
-                    if (!response.ok) throw new Error(data.error || "Unknown server error");
+                    if (!response.ok) {
+                        // Check if the server sent a JSON error message
+                        if (data.error) {
+                            throw new Error(data.error);
+                        }
+                        // This handles the HTML error page (like a 502)
+                        if (response.headers.get("content-type")?.includes("text/html")) {
+                            throw new Error("Server error. It returned an HTML page instead of JSON. The backend may have crashed.");
+                        }
+                        throw new Error(`HTTP error ${response.status}`);
+                    }
                     
                     const cleanResponse = cleanAIResponse(data.story_text);
                     aiOutputCanvas.value = cleanResponse;
                     
                 } catch (err) {
                     console.error("AI Generation Error:", err);
-                    aiOutputCanvas.value = `Error: ${err.message}`;
+                    // This is where the user's error comes from
+                    if (err.message.includes("Unexpected token")) {
+                        aiOutputCanvas.value = `Error: Received invalid JSON. This usually means the backend (Hugging Face) crashed. The model (e.g., 'Heavy') may be too large for the server's RAM.`;
+                    } else {
+                        aiOutputCanvas.value = `Error: ${err.message}`;
+                    }
                 } finally {
                     btnToDisable.disabled = false;
                     aiGenerateBtn.disabled = false;
@@ -1244,6 +1351,43 @@ Generate the next part of the story:`;
                     showToast("AI response copied to clipboard.", "success");
                 } catch (err) {
                     showToast("Failed to copy text.", "error");
+                }
+            }
+
+            // NEW: Save Creation to Library
+            function saveCreationToLibrary() {
+                const content = aiContextInput.value;
+                if (!content || content.trim() === '') {
+                    showToast("Story Context is empty. Nothing to save.", "error");
+                    return;
+                }
+                
+                const title = prompt("Enter a title for your new story:", "My New Creation");
+                if (!title) return; // User cancelled prompt
+
+                const id = 'user_' + Date.now();
+                const newStory = {
+                    title: title,
+                    author: "You",
+                    // Create a simple, single-node story
+                    nodes: {
+                        "root": {
+                            title: "Chapter 1", // You can expand this later
+                            content: content,
+                            choices: []
+                        }
+                    }
+                };
+
+                // Add to our loaded userStories object and save to localStorage
+                userStories[id] = newStory;
+                try {
+                    localStorage.setItem(DB_KEY, JSON.stringify(userStories));
+                    showToast("Story saved to 'My Creations' in the Library!", "success");
+                    renderReaderLibrary(); // Refresh library to show new story
+                } catch (e) {
+                    console.error("Error saving to localStorage:", e);
+                    showToast("Error: Could not save story. Storage may be full.", "error");
                 }
             }
             
@@ -1284,7 +1428,7 @@ Generate the next part of the story:`;
                 
                 // Reader
                 readerCloseBtn.addEventListener('click', closeReader);
-                initTTS();
+                initTTS(); // This now initializes TTS for both modal and creator
                 
                 // Creator
                 aiGenerateBtn.addEventListener('click', () => callAI('generate'));
@@ -1292,6 +1436,7 @@ Generate the next part of the story:`;
                 aiLikeBtn.addEventListener('click', () => showToast("Feedback: Liked!", "success"));
                 aiDislikeBtn.addEventListener('click', () => showToast("Feedback: Disliked.", "success"));
                 copyTextBtn.addEventListener('click', copyOutputToClipboard);
+                saveToLibraryBtn.addEventListener('click', saveCreationToLibrary); // NEW
                 
                 addToContextBtn.addEventListener('click', () => {
                     const output = aiOutputCanvas.value;
@@ -1299,7 +1444,7 @@ Generate the next part of the story:`;
                         aiContextInput.value += `\n\n${output}`;
                         aiOutputCanvas.value = "";
                         aiPromptInput.value = "";
-                        // Auto-save on add
+                        // Auto-save work-in-progress
                         localStorage.setItem(LOCAL_CONTEXT_KEY, aiContextInput.value); 
                         showToast("Added to context and auto-saved.", "success");
                     } else {
@@ -1312,8 +1457,8 @@ Generate the next part of the story:`;
                 loadLocalBtn.addEventListener('click', loadLocalContext);
                 
                 // Load data
-                loadUserStories(); 
-                await loadFeaturedStories(); 
+                loadUserStories(); // Load from local storage
+                await loadFeaturedStories(); // Load from repo
                 
                 // Render initial views
                 showPage('home'); // Show home page on load
