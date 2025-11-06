@@ -49,25 +49,31 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1rem 1.5rem; /* More mobile friendly */
+            padding: 1rem 1.5rem;
             background-color: var(--bg-primary);
             border-bottom: 1px solid var(--border-color);
             box-shadow: var(--shadow);
             flex-shrink: 0;
-            z-index: 10;
+            z-index: 20; /* Above mobile menu background */
+            position: relative; /* For z-index */
         }
         .logo {
-            font-size: 1.5rem; /* Smaller for mobile */
+            font-size: 1.5rem;
             font-weight: 700;
             color: var(--text-primary);
         }
         .logo span {
             color: var(--accent-primary);
         }
-        .tab-buttons { display: flex; gap: 0.25rem; }
+
+        /* --- Responsive Navigation --- */
+        .nav-menu {
+            display: flex;
+            gap: 0.25rem;
+        }
         .tab-btn {
             font-family: var(--font-family);
-            font-size: 0.9rem; /* Smaller for mobile */
+            font-size: 1rem; /* Slightly larger */
             font-weight: 600;
             padding: 0.5rem 1rem;
             background: transparent;
@@ -77,6 +83,7 @@
             border-radius: 0;
             cursor: pointer;
             transition: color 0.2s, border-color 0.2s;
+            text-decoration: none; /* In case <a> tags are used */
         }
         .tab-btn:hover {
             color: var(--text-primary);
@@ -84,6 +91,52 @@
         .tab-btn.active {
             color: var(--accent-primary);
             border-bottom-color: var(--accent-primary);
+        }
+
+        /* Hamburger Toggle - Hidden by default */
+        .menu-toggle {
+            display: none;
+            font-size: 1.5rem;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+            color: var(--text-primary);
+            z-index: 21; /* Above nav menu */
+        }
+
+        /* Mobile Menu Styles */
+        @media (max-width: 600px) {
+            .menu-toggle {
+                display: block;
+            }
+            .nav-menu {
+                display: none; /* Hide by default */
+                flex-direction: column;
+                position: absolute;
+                top: 100%; /* Position below header */
+                left: 0;
+                width: 100%;
+                background: var(--bg-primary);
+                box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+                padding: 1rem 0;
+                border-bottom: 1px solid var(--border-color);
+            }
+            .nav-menu.active {
+                display: flex; /* Show when active */
+            }
+            .tab-btn {
+                width: 100%;
+                text-align: left;
+                padding: 1rem 1.5rem;
+                border-bottom: 0;
+                border-left: 3px solid transparent;
+            }
+            .tab-btn.active {
+                border-bottom: 0;
+                border-left-color: var(--accent-primary);
+                background-color: var(--bg-secondary);
+            }
         }
         
         main {
@@ -302,18 +355,24 @@
         .tts-setting select, .tts-setting input[type="range"] { margin: 0; padding: 0.5rem; background-color: var(--bg-primary); }
         
         /* --- NEW CREATOR TAB --- */
-        /* This is now a 2-column grid on desktop, and 1-column on mobile */
-        #creator-tab.active {
+        
+        /* FIX: Apply padding to the tab content, not the layout */
+        #creator-tab {
+            padding: 0; /* Remove padding from the tab content */
+        }
+        
+        /* FIX: Apply grid to the inner layout wrapper */
+        .creator-layout {
             display: grid;
             grid-template-columns: 1fr; /* Mobile-first: single column */
             height: 100%;
-            overflow: hidden;
+            overflow: hidden; /* Hide overflow of the grid container */
         }
         
         .creator-input-panel {
             padding: 1.5rem;
             border-bottom: 1px solid var(--border-color);
-            overflow-y: auto;
+            overflow-y: auto; /* Scroll this panel */
             background-color: var(--bg-secondary);
         }
         
@@ -321,17 +380,22 @@
             padding: 1.5rem;
             display: flex;
             flex-direction: column;
-            overflow-y: auto;
+            overflow-y: auto; /* Scroll this panel */
         }
 
         /* Desktop layout */
         @media (min-width: 769px) {
-            #creator-tab.active {
+            /* FIX: Apply desktop grid to the layout wrapper */
+            .creator-layout {
                 grid-template-columns: 400px 1fr; /* Two columns on desktop */
             }
             .creator-input-panel {
                 border-right: 1px solid var(--border-color);
                 border-bottom: none;
+                height: 100%; /* Ensure it fills the grid cell height */
+            }
+            .creator-output-panel {
+                height: 100%; /* Ensure it fills the grid cell height */
             }
         }
 
@@ -423,50 +487,35 @@
 </head>
 <body>
 
-    <!-- ======================= -->
-    <!-- ===== HEADER & NAV ==== -->
-    <!-- ======================= -->
     <header>
         <div class="logo">Lunarith<span>.</span></div>
-        <div class="tab-buttons">
-            <button class="tab-btn active" data-tab="reader-tab">Reader</button>
-            <button class="tab-btn" data-tab="creator-tab">Creator</button>
-        </div>
+        <nav>
+            <div class="nav-menu" id="nav-menu">
+                <button class="tab-btn active" data-tab="reader-tab">Reader</button>
+                <button class="tab-btn" data-tab="creator-tab">Creator</button>
+            </div>
+        </nav>
+        <button class="menu-toggle" id="menu-toggle" aria-label="Toggle navigation">
+            ☰
+        </button>
     </header>
 
-    <!-- ======================= -->
-    <!-- ===== MAIN CONTENT ==== -->
-    <!-- ======================= -->
     <main>
-        <!-- ======================= -->
-        <!-- ===== READER TAB ====== -->
-        <!-- ======================= -->
         <div id="reader-tab" class="tab-content active">
             <h1>Story Library</h1>
             
             <h2 style="color: var(--accent-primary); border-bottom-color: var(--accent-primary);">Featured Stories</h2>
             <div class="story-library-grid" id="featured-story-grid">
-                <!-- JS will fill this -->
-            </div>
+                </div>
             
-            <h2 style="margin-top: 2rem;">Your Creations</h2>
-            <div class="story-library-grid" id="user-story-grid">
-                <!-- JS will fill this. This is now legacy. -->
             </div>
-        </div>
 
-        <!-- ======================= -->
-        <!-- ===== CREATOR TAB (NEW) ===== -->
-        <!-- ======================= -->
         <div id="creator-tab" class="tab-content">
             
-            <!-- This layout is now mobile-first (1 column) and desktop (2 columns) -->
             <div class="creator-layout">
                 
-                <!-- === Left Panel (Input) === -->
                 <aside class="creator-input-panel">
                     
-                    <!-- Backend Status -->
                     <div class="panel-section">
                         <h3>Backend Status</h3>
                         <div style="display: flex; align-items: center; margin-bottom: 1rem;">
@@ -476,7 +525,6 @@
                         <button id="connect-btn" class="btn-primary" style="width: 100%;">Connect</button>
                     </div>
 
-                    <!-- AI Controls -->
                     <fieldset id="ai-controls" class="panel-section" disabled>
                         <h3>AI Controls</h3>
                         
@@ -497,7 +545,6 @@
                         </div>
                     </fieldset>
                     
-                    <!-- Legacy buttons for saving locally. You can remove this section if you don't want it. -->
                     <div class="panel-section">
                         <h3>Story Manager (Local)</h3>
                         <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem;">
@@ -511,7 +558,6 @@
 
                 </aside>
 
-                <!-- === Right Panel (Output Canvas) === -->
                 <main class="creator-output-panel">
                     <h2>AI Response</h2>
                     <textarea id="ai-output-canvas" placeholder="AI-generated text will appear here..."></textarea>
@@ -531,9 +577,6 @@
         </div>
     </main>
     
-    <!-- ======================= -->
-    <!-- === READER MODAL ====== -->
-    <!-- ======================= -->
     <div id="reader-view" class="reader-view" style="display: none;">
         <header class="reader-header">
             <h2 id="reader-title" class="reader-title">Story Title</h2>
@@ -541,7 +584,6 @@
         </header>
 
         <div class="reader-content-wrapper">
-            <!-- TTS Player -->
             <div class="tts-player">
                 <div class="tts-controls-main">
                     <button id="tts-play" class="btn-primary" title="Play">▶️</button>
@@ -562,26 +604,19 @@
             </div>
 
             <div class="reader-breadcrumbs" id="reader-breadcrumbs">
-                <!-- Breadcrumbs go here -->
-            </div>
+                </div>
             
             <div class="reader-text" id="reader-text-content">
-                <!-- Story text goes here -->
-            </div>
+                </div>
 
             <div classs="reader-choices" id="reader-choices">
                 <h3>What happens next?</h3>
-                <!-- Choice buttons go here -->
-            </div>
+                </div>
         </div>
     </div>
 
-    <!-- NEW: TOAST NOTIFICATION ELEMENT -->
     <div id="toast-notification">Toast message</div>
 
-    <!-- ======================= -->
-    <!-- ====== JAVASCRIPT ===== -->
-    <!-- ======================= -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
 
@@ -606,11 +641,13 @@
             let toastTimer; // Timer for the toast notification
             
             // --- SELECTORS (cache all) ---
+            const menuToggle = document.getElementById('menu-toggle'); // NEW
+            const navMenu = document.getElementById('nav-menu'); // NEW
             const tabButtons = document.querySelectorAll('.tab-btn');
             const tabContents = document.querySelectorAll('.tab-content');
             const featuredStoryGrid = document.getElementById('featured-story-grid');
-            const userStoryGrid = document.getElementById('user-story-grid');
-            const toast = document.getElementById('toast-notification'); // NEW
+            // const userStoryGrid = document.getElementById('user-story-grid'); // REMOVED
+            const toast = document.getElementById('toast-notification');
             
             // Reader Modal
             const readerView = document.getElementById('reader-view');
@@ -654,7 +691,7 @@
             const loadLocalBtn = document.getElementById('load-local-btn');
             
 
-            // --- NEW: TOAST NOTIFICATION FUNCTION ---
+            // --- TOAST NOTIFICATION FUNCTION ---
             /**
              * Replaces alert() with a non-blocking toast notification.
              * @param {string} message The text to display.
@@ -686,7 +723,8 @@
             
             async function loadFeaturedStories() {
                 try {
-                    const response = await fetch('stories/index.json?t=' + Date.now()); // Cache-bust
+                    // Cache-bust
+                    const response = await fetch('stories/index.json?t=' + Date.now()); 
                     if (!response.ok) throw new Error('Failed to load stories/index.json. Create this file in your repo.');
                     const index = await response.json();
                     
@@ -707,6 +745,12 @@
                 
                 if (targetTab === 'reader-tab') {
                     renderReaderLibrary();
+                }
+
+                // Close mobile menu on tab click
+                if (navMenu.classList.contains('active')) {
+                    navMenu.classList.remove('active');
+                    menuToggle.textContent = '☰';
                 }
             }
             
@@ -775,18 +819,8 @@
                     });
                 }
                 
-                // Render User Stories (Legacy)
-                userStoryGrid.innerHTML = '';
-                const userStoryIds = Object.keys(userStories);
-                if (userStoryIds.length === 0) {
-                    userStoryGrid.innerHTML = `<p style="color: var(--text-secondary);">You haven't created any stories yet. Use the 'Creator' tab!</p>`;
-                } else {
-                    userStoryIds.forEach(storyId => {
-                        const story = userStories[storyId];
-                        const card = createStoryCard(storyId, story, false);
-                        userStoryGrid.appendChild(card);
-                    });
-                }
+                // User Stories (Legacy) - This section is removed from HTML
+                // but the logic is kept in case you want to add it back.
             }
             
             function createStoryCard(storyId, story, isFeatured) {
@@ -819,7 +853,6 @@
                         activeStoryData = storyData;
                     } catch (e) {
                         console.error(e);
-                        // REPLACED ALERT
                         showToast("Error: Could not load featured story data.", "error");
                         return;
                     }
@@ -883,7 +916,6 @@
                     }
                 });
                 
-                // --- BUG FIX ---
                 // Clean the AI preamble from the content before rendering
                 const cleanContent = cleanAIResponse(node.content || "This chapter is empty.");
                 
@@ -924,19 +956,11 @@
             }
             
             /**
-             * --- THIS IS THE BUG FIX ---
              * Removes the AI preamble from the story text.
              */
             function cleanAIResponse(text) {
                 let cleanText = text.trim();
                 
-                // List of common preambles to remove, case-insensitive
-                const preambles = [
-                    "here is chapter 1:",
-                    "here is the continuation:",
-                    "thank you for providing me with the context and instructions."
-                ];
-
                 // This regex finds a preamble, even if it's a few lines down
                 // It looks for "Here is..." or "Thank you..." at the start of a line
                 const regex = /^(?:.*\n)*?(here is chapter \d+:|here is the continuation:|thank you for providing me with the context and instructions.)/i;
@@ -1039,7 +1063,6 @@
              */
             async function callAI(mode) {
                 if (!isBackendConnected) { 
-                    // REPLACED ALERT
                     showToast("Error: Backend is not connected.", "error"); 
                     return; 
                 }
@@ -1049,7 +1072,6 @@
 
                 if (mode === 'regenerate') {
                     if (!lastAiGenPrompt) {
-                        // REPLACED ALERT
                         showToast("No previous prompt to regenerate.", "error");
                         return;
                     }
@@ -1058,7 +1080,6 @@
                     const context = aiContextInput.value;
                     const prompt = aiPromptInput.value;
                     if (!prompt) {
-                        // REPLACED ALERT
                         showToast("Please enter a prompt or instruction.", "error");
                         return;
                     }
@@ -1079,7 +1100,7 @@ Generate the next part of the story:`;
                 const originalBtnText = btnToDisable.textContent;
                 btnToDisable.disabled = true;
                 aiGenerateBtn.disabled = true;
-                aiRegenerateBtn.disabled = true;
+                aiRegenerTebtn.disabled = true;
                 btnToDisable.textContent = 'Generating...';
                 aiOutputCanvas.value = "Generating response...";
 
@@ -1144,11 +1165,21 @@ Generate the next part of the story:`;
                 showToast("Story context saved to this browser.", "success");
             }
 
+            // --- MOBILE NAV TOGGLE ---
+            function toggleMenu() {
+                navMenu.classList.toggle('active');
+                if (navMenu.classList.contains('active')) {
+                    menuToggle.textContent = '✕'; // Close icon
+                } else {
+                    menuToggle.textContent = '☰'; // Hamburger icon
+                }
+            }
 
             // --- INITIALIZE ---
             
             async function init() {
                 // Attach main event listeners
+                menuToggle.addEventListener('click', toggleMenu); // NEW
                 tabButtons.forEach(btn => btn.addEventListener('click', switchTab));
                 connectBtn.addEventListener('click', checkBackendStatus);
                 
@@ -1171,7 +1202,6 @@ Generate the next part of the story:`;
                         aiPromptInput.value = "";
                         saveLocalContext(); // Auto-save on add
                     } else {
-                        // REPLACED ALERT
                         showToast("No valid text to add.", "error");
                     }
                 });
@@ -1203,5 +1233,3 @@ Generate the next part of the story:`;
     </script>
 </body>
 </html>
-
-
