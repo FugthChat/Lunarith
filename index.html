@@ -3,15 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lunarith Story Creator</title>
+    <title>Fugth AI Studio</title>
     
     <style>
         :root {
             --bg-primary: #FFFFFF;
             --bg-secondary: #F0F4F8;
             --bg-tertiary: #E2E8F0;
+            --bg-sidebar: #1A202C;
             --text-primary: #1A202C;
             --text-secondary: #4A5568;
+            --text-sidebar: #E2E8F0;
+            --text-sidebar-hover: #FFFFFF;
             --accent-primary: #3182CE;
             --accent-hover: #2B6CB0;
             --accent-danger: #E53E3E;
@@ -19,6 +22,7 @@
             --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             --radius: 8px;
             --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --sidebar-width: 240px;
         }
 
         /* --- Base Setup --- */
@@ -35,8 +39,6 @@
             font-family: var(--font-family);
             background-color: var(--bg-primary);
             color: var(--text-primary);
-            display: flex;
-            flex-direction: column;
             line-height: 1.6;
             font-size: 16px;
         }
@@ -44,117 +46,178 @@
         ::-webkit-scrollbar-track { background: var(--bg-tertiary); }
         ::-webkit-scrollbar-thumb { background-color: var(--accent-primary); border-radius: 4px; }
         
-        /* --- Header & Navigation --- */
-        header {
+        /* --- New App Layout --- */
+        .app-container {
             display: flex;
-            justify-content: space-between;
+            height: 100vh;
+        }
+
+        /* --- Sidebar Navigation --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100%;
+            background-color: var(--bg-sidebar);
+            color: var(--text-sidebar);
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem 1rem;
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+        .sidebar-header {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #FFF;
+            padding: 0 0.5rem 1.5rem 0.5rem;
+        }
+        .sidebar-header span {
+            color: var(--accent-primary);
+        }
+        .nav-links {
+            flex-grow: 1;
+            list-style: none;
+        }
+        .nav-link {
+            display: flex;
             align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius);
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-sidebar);
+            text-decoration: none;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+            border: none;
+            background: transparent;
+            width: 100%;
+            text-align: left;
+        }
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-sidebar-hover);
+        }
+        .nav-link.active {
+            background-color: var(--accent-primary);
+            color: #FFF;
+        }
+        .nav-link-icon {
+            font-size: 1.2rem;
+            width: 24px; /* Align text */
+            text-align: center;
+        }
+
+        /* --- Sidebar Footer (Backend Status) --- */
+        .sidebar-footer {
+            padding: 1rem 0.5rem 0 0.5rem;
+            border-top: 1px solid #4A5568;
+        }
+        .status-light {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 0.5rem;
+            border: 1px solid rgba(0,0,0,0.1);
+            background-color: var(--text-secondary);
+            transition: background-color 0.3s;
+        }
+        .status-light.connecting { background-color: #ECC94B; }
+        .status-light.connected { background-color: #48BB78; }
+        .status-light.error { background-color: #F56C6C; }
+        #status-text { 
+            color: var(--text-sidebar);
+            font-size: 0.9rem;
+        }
+        #connect-btn {
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        /* --- Main Content Area --- */
+        .main-content {
+            flex-grow: 1;
+            height: 100vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Mobile Header */
+        .mobile-header {
+            display: none; /* Hidden on desktop */
             padding: 1rem 1.5rem;
-            background-color: var(--bg-primary);
+            background: var(--bg-primary);
             border-bottom: 1px solid var(--border-color);
             box-shadow: var(--shadow);
-            flex-shrink: 0;
-            z-index: 20; /* Above mobile menu background */
-            position: relative; /* For z-index */
+            align-items: center;
+            gap: 1rem;
         }
-        .logo {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-        .logo span {
-            color: var(--accent-primary);
-        }
-
-        /* --- Responsive Navigation --- */
-        .nav-menu {
-            display: flex;
-            gap: 0.25rem;
-        }
-        .tab-btn {
-            font-family: var(--font-family);
-            font-size: 1rem; /* Slightly larger */
-            font-weight: 600;
-            padding: 0.5rem 1rem;
-            background: transparent;
-            color: var(--text-secondary);
-            border: 0;
-            border-bottom: 3px solid transparent;
-            border-radius: 0;
-            cursor: pointer;
-            transition: color 0.2s, border-color 0.2s;
-            text-decoration: none; /* In case <a> tags are used */
-        }
-        .tab-btn:hover {
-            color: var(--text-primary);
-        }
-        .tab-btn.active {
-            color: var(--accent-primary);
-            border-bottom-color: var(--accent-primary);
-        }
-
-        /* Hamburger Toggle - Hidden by default */
         .menu-toggle {
-            display: none;
             font-size: 1.5rem;
             background: transparent;
             border: none;
             cursor: pointer;
-            padding: 0.5rem;
             color: var(--text-primary);
-            z-index: 21; /* Above nav menu */
+        }
+        .mobile-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        .mobile-logo span { color: var(--accent-primary); }
+
+        .page-content {
+            display: none; /* Hide all pages by default */
+            flex-grow: 1;
+            overflow-y: auto; /* Allow individual page scrolling */
+            padding: 2rem;
+        }
+        .page-content.active {
+            display: block; /* Show active page */
+        }
+        
+        /* Mobile Overlay */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+        .overlay.active {
+            display: block;
         }
 
-        /* Mobile Menu Styles */
-        @media (max-width: 600px) {
-            .menu-toggle {
-                display: block;
-            }
-            .nav-menu {
-                display: none; /* Hide by default */
-                flex-direction: column;
-                position: absolute;
-                top: 100%; /* Position below header */
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
                 left: 0;
+                top: 0;
+                height: 100%;
+                transform: translateX(-100%);
+            }
+            .sidebar.active {
+                transform: translateX(0);
+                box-shadow: 0 0 20px rgba(0,0,0,0.2);
+            }
+            .mobile-header {
+                display: flex;
+            }
+            .main-content {
                 width: 100%;
-                background: var(--bg-primary);
-                box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-                padding: 1rem 0;
-                border-bottom: 1px solid var(--border-color);
             }
-            .nav-menu.active {
-                display: flex; /* Show when active */
-            }
-            .tab-btn {
-                width: 100%;
-                text-align: left;
-                padding: 1rem 1.5rem;
-                border-bottom: 0;
-                border-left: 3px solid transparent;
-            }
-            .tab-btn.active {
-                border-bottom: 0;
-                border-left-color: var(--accent-primary);
-                background-color: var(--bg-secondary);
+            .page-content {
+                padding: 1.5rem;
             }
         }
         
-        main {
-            flex-grow: 1;
-            display: flex;
-            overflow: hidden; /* Key for scrolling tabs */
-            height: 100%; 
-        }
-        .tab-content {
-            display: none;
-            width: 100%;
-            height: 100%;
-            overflow-y: auto; /* THIS FIXES SCROLLING */
-            padding: 1.5rem;
-        }
-        .tab-content.active {
-            display: block;
-        }
 
         /* --- Utility Components --- */
         h1, h2, h3 {
@@ -237,15 +300,15 @@
         }
         .button-group { display: flex; flex-wrap: wrap; gap: 0.75rem; }
 
-        /* --- READER TAB --- */
+        /* --- Story Library (Reader Tab) --- */
         .story-library-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* Smaller cards for mobile */
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
             gap: 1rem;
         }
         @media (min-width: 600px) {
             .story-library-grid {
-                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Larger cards for desktop */
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             }
         }
         .story-card {
@@ -263,15 +326,11 @@
         }
         .story-card-cover {
             width: 100%;
-            height: 220px; /* Shorter for mobile */
+            height: 220px;
             object-fit: cover;
             background-color: var(--bg-secondary);
         }
-        @media (min-width: 600px) {
-            .story-card-cover {
-                height: 300px; /* Taller for desktop */
-            }
-        }
+        @media (min-width: 600px) { .story-card-cover { height: 300px; } }
         .story-card-content { padding: 1rem; }
         .story-card-title {
             font-size: 1.1rem;
@@ -354,25 +413,17 @@
         .tts-setting label { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.25rem; }
         .tts-setting select, .tts-setting input[type="range"] { margin: 0; padding: 0.5rem; background-color: var(--bg-primary); }
         
-        /* --- NEW CREATOR TAB --- */
-        
-        /* FIX: Apply padding to the tab content, not the layout */
-        #creator-tab {
-            padding: 0; /* Remove padding from the tab content */
-        }
-        
-        /* FIX: Apply grid to the inner layout wrapper */
+        /* --- CREATOR PAGE LAYOUT --- */
         .creator-layout {
             display: grid;
             grid-template-columns: 1fr; /* Mobile-first: single column */
-            height: 100%;
-            overflow: hidden; /* Hide overflow of the grid container */
+            gap: 1.5rem;
         }
         
         .creator-input-panel {
             padding: 1.5rem;
-            border-bottom: 1px solid var(--border-color);
-            overflow-y: auto; /* Scroll this panel */
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
             background-color: var(--bg-secondary);
         }
         
@@ -380,31 +431,28 @@
             padding: 1.5rem;
             display: flex;
             flex-direction: column;
-            overflow-y: auto; /* Scroll this panel */
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            background-color: var(--bg-primary);
         }
 
         /* Desktop layout */
         @media (min-width: 769px) {
-            /* FIX: Apply desktop grid to the layout wrapper */
             .creator-layout {
                 grid-template-columns: 400px 1fr; /* Two columns on desktop */
-            }
-            .creator-input-panel {
-                border-right: 1px solid var(--border-color);
-                border-bottom: none;
-                height: 100%; /* Ensure it fills the grid cell height */
-            }
-            .creator-output-panel {
-                height: 100%; /* Ensure it fills the grid cell height */
+                /* Remove height 100% as the page scrolls */
             }
         }
-
+        
         .panel-section {
             background: var(--bg-primary);
             border: 1px solid var(--border-color);
             border-radius: var(--radius);
             padding: 1rem;
             margin-bottom: 1.5rem;
+        }
+        .panel-section:last-child {
+            margin-bottom: 0;
         }
         .panel-section h3 {
             margin-top: 0;
@@ -439,23 +487,7 @@
             opacity: 1;
         }
 
-        /* Status Light */
-        .status-light {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 0.5rem;
-            border: 1px solid rgba(0,0,0,0.1);
-            background-color: var(--text-secondary);
-            transition: background-color 0.3s;
-        }
-        .status-light.connecting { background-color: #ECC94B; }
-        .status-light.connected { background-color: #48BB78; }
-        .status-light.error { background-color: #F56C6C; }
-        #status-text { color: var(--text-secondary); }
-
-        /* --- NEW TOAST NOTIFICATION --- */
+        /* --- TOAST NOTIFICATION --- */
         #toast-notification {
             position: fixed;
             top: 20px;
@@ -487,95 +519,141 @@
 </head>
 <body>
 
-    <header>
-        <div class="logo">Lunarith<span>.</span></div>
-        <nav>
-            <div class="nav-menu" id="nav-menu">
-                <button class="tab-btn active" data-tab="reader-tab">Reader</button>
-                <button class="tab-btn" data-tab="creator-tab">Creator</button>
+    <div class="app-container">
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                Fugth<span>AI</span>
+            </div>
+            
+            <ul class="nav-links">
+                <li>
+                    <button class="nav-link active" data-page="home">
+                        <span class="nav-link-icon">🏠</span> Home
+                    </button>
+                </li>
+                <li>
+                    <button class="nav-link" data-page="creator">
+                        <span class="nav-link-icon">✨</span> Creator
+                    </button>
+                </li>
+                <li>
+                    <button class="nav-link" data-page="library">
+                        <span class="nav-link-icon">📚</span> Library
+                    </button>
+                </li>
+                <li>
+                    <button class="nav-link" data-page="settings">
+                        <span class="nav-link-icon">⚙️</span> Settings
+                    </button>
+                </li>
+            </ul>
+            
+            <div class="sidebar-footer">
+                <div style="display: flex; align-items: center; margin-bottom: 0.5rem;">
+                    <span id="status-light" class="status-light"></span>
+                    <span id="status-text">Offline</span>
+                </div>
+                <button id="connect-btn" class="btn-primary">Connect</button>
             </div>
         </nav>
-        <button class="menu-toggle" id="menu-toggle" aria-label="Toggle navigation">
-            ☰
-        </button>
-    </header>
 
-    <main>
-        <div id="reader-tab" class="tab-content active">
-            <h1>Story Library</h1>
-            
-            <h2 style="color: var(--accent-primary); border-bottom-color: var(--accent-primary);">Featured Stories</h2>
-            <div class="story-library-grid" id="featured-story-grid">
-                </div>
-            
-            </div>
+        <main class="main-content">
+            <header class="mobile-header">
+                <button class="menu-toggle" id="menu-toggle">☰</button>
+                <div class="mobile-logo">Fugth<span>AI</span></div>
+            </header>
 
-        <div id="creator-tab" class="tab-content">
-            
-            <div class="creator-layout">
+            <div id="page-home" class="page-content active">
+                <h1>Welcome to Fugth AI Studio</h1>
+                <p style="font-size: 1.1rem; color: var(--text-secondary); max-width: 600px; margin-bottom: 2rem;">
+                    This is your all-in-one platform to create, manage, and read interactive, AI-powered stories.
+                </p>
                 
-                <aside class="creator-input-panel">
-                    
-                    <div class="panel-section">
-                        <h3>Backend Status</h3>
-                        <div style="display: flex; align-items: center; margin-bottom: 1rem;">
-                            <span id="status-light" class="status-light"></span>
-                            <span id="status-text">Offline</span>
-                        </div>
-                        <button id="connect-btn" class="btn-primary" style="width: 100%;">Connect</button>
+                <h2 style="color: var(--accent-primary); border-bottom-color: var(--accent-primary);">Featured Stories</h2>
+                <div class="story-library-grid" id="featured-story-grid">
                     </div>
-
-                    <fieldset id="ai-controls" class="panel-section" disabled>
-                        <h3>AI Controls</h3>
-                        
-                        <label for="model-select">Model:</label>
-                        <select id="model-select" disabled>
-                            <option value="">-- Offline --</option>
-                        </select>
-                        
-                        <label for="ai-context-input">1. Story Context (Paste your story here)</label>
-                        <textarea id="ai-context-input" rows="8" placeholder="Paste the story so far..."></textarea>
-
-                        <label for="ai-prompt-input">2. Your Prompt (Instruction or Chat)</label>
-                        <textarea id="ai-prompt-input" rows="5" placeholder="e.g., 'Continue the story' or 'What if the hero finds a dragon?'"></textarea>
-                        
-                        <div class="button-group">
-                            <button id="ai-generate-btn" class="btn-primary">Generate</button>
-                            <button id="ai-regenerate-btn" class="btn-secondary">Regenerate</button>
-                        </div>
-                    </fieldset>
-                    
-                    <div class="panel-section">
-                        <h3>Story Manager (Local)</h3>
-                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem;">
-                            This saves your work to this browser. To "publish", copy your text and create a new JSON file in your GitHub `stories/` folder.
-                        </p>
-                        <div class="button-group" style="flex-direction: column; gap: 0.75rem;">
-                            <button id="save-local-btn" class="btn-primary">Save Context Locally</button>
-                            <button id="load-local-btn" class="btn-secondary">Load Local Context</button>
-                        </div>
-                    </div>
-
-                </aside>
-
-                <main class="creator-output-panel">
-                    <h2>AI Response</h2>
-                    <textarea id="ai-output-canvas" placeholder="AI-generated text will appear here..."></textarea>
-                    
-                    <div class="button-group" style="margin-top: 1rem; justify-content: space-between;">
-                        <div>
-                            <button id="copy-text-btn" class="btn-secondary" title="Copy text to clipboard">Copy Text</button>
-                            <button id="add-to-context-btn" class="btn-secondary" title="Append this text to the context input">Add to Context</button>
-                        </div>
-                        <div class="ai-feedback">
-                            <button id="ai-like-btn" title="Like response">👍</button>
-                            <button id="ai-dislike-btn" title="Dislike response">👎</button>
-                        </div>
-                    </div>
-                </main>
             </div>
-        </div>
-    </main>
+            
+            <div id="page-creator" class="page-content">
+                <h1>AI Creator</h1>
+                
+                <div class="creator-layout">
+                    <aside class="creator-input-panel">
+                        <fieldset id="ai-controls" class="panel-section" disabled>
+                            <h3>AI Controls</h3>
+                            
+                            <label for="model-select">Model:</label>
+                            <select id="model-select" disabled>
+                                <option value="">-- Offline --</option>
+                            </select>
+                            
+                            <label for="ai-context-input">1. Story Context (Paste your story here)</label>
+                            <textarea id="ai-context-input" rows="8" placeholder="Paste the story so far..."></textarea>
+
+                            <label for="ai-prompt-input">2. Your Prompt (Instruction or Chat)</label>
+                            <textarea id="ai-prompt-input" rows="5" placeholder="e.g., 'Continue the story' or 'What if the hero finds a dragon?'"></textarea>
+                            
+                            <div class="button-group">
+                                <button id="ai-generate-btn" class="btn-primary">Generate</button>
+                                <button id="ai-regenerate-btn" class="btn-secondary">Regenerate</button>
+                            </div>
+                        </fieldset>
+                    </aside>
+
+                    <main class="creator-output-panel">
+                        <h2>AI Response</h2>
+                        <textarea id="ai-output-canvas" placeholder="AI-generated text will appear here..."></textarea>
+                        
+                        <div class="button-group" style="margin-top: 1rem; justify-content: space-between;">
+                            <div>
+                                <button id="copy-text-btn" class="btn-secondary" title="Copy text to clipboard">Copy</button>
+                                <button id="add-to-context-btn" class="btn-secondary" title="Append this text to the context input">Add to Context</button>
+                            </div>
+                            <div class="ai-feedback">
+                                <button id="ai-like-btn" title="Like response">👍</button>
+                                <button id="ai-dislike-btn" title="Dislike response">👎</button>
+                            </div>
+                        </div>
+                    </main>
+                </div>
+            </div>
+
+            <div id="page-library" class="page-content">
+                <h1>Story Library</h1>
+                <p style="font-size: 1.1rem; color: var(--text-secondary); max-width: 600px; margin-bottom: 2rem;">
+                    Browse all available stories. This will include featured stories and, in the future, your own published creations.
+                </p>
+                <div class="story-library-grid" id="user-story-grid">
+                    </div>
+            </div>
+
+            <div id="page-settings" class="page-content">
+                <h1>Settings</h1>
+                
+                <div class="panel-section" style="max-width: 500px;">
+                    <h3>Story Manager (Local)</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem;">
+                        This saves/loads your "Creator" context to this browser. It's useful for saving your work-in-progress.
+                    </p>
+                    <div class="button-group" style="gap: 0.75rem;">
+                        <button id="save-local-btn" class="btn-primary">Save Context Locally</button>
+                        <button id="load-local-btn" class="btn-secondary">Load Local Context</button>
+                    </div>
+                </div>
+
+                <div class="panel-section" style="max-width: 500px; opacity: 0.5;">
+                    <h3>Theme (Coming Soon)</h3>
+                    <label for="theme-select">Select Theme:</label>
+                    <select id="theme-select" disabled>
+                        <option>Light Mode</option>
+                        <option>Dark Mode</option>
+                    </select>
+                </div>
+
+            </div>
+
+        </main>
+    </div>
     
     <div id="reader-view" class="reader-view" style="display: none;">
         <header class="reader-header">
@@ -617,6 +695,8 @@
 
     <div id="toast-notification">Toast message</div>
 
+    <div class="overlay" id="overlay"></div>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
 
@@ -641,12 +721,14 @@
             let toastTimer; // Timer for the toast notification
             
             // --- SELECTORS (cache all) ---
-            const menuToggle = document.getElementById('menu-toggle'); // NEW
-            const navMenu = document.getElementById('nav-menu'); // NEW
-            const tabButtons = document.querySelectorAll('.tab-btn');
-            const tabContents = document.querySelectorAll('.tab-content');
+            const sidebar = document.getElementById('sidebar');
+            const menuToggle = document.getElementById('menu-toggle');
+            const overlay = document.getElementById('overlay');
+            const navLinks = document.querySelectorAll('.nav-link');
+            const pages = document.querySelectorAll('.page-content');
+
             const featuredStoryGrid = document.getElementById('featured-story-grid');
-            // const userStoryGrid = document.getElementById('user-story-grid'); // REMOVED
+            const userStoryGrid = document.getElementById('user-story-grid');
             const toast = document.getElementById('toast-notification');
             
             // Reader Modal
@@ -666,7 +748,7 @@
             const ttsRateSlider = document.getElementById('tts-rate-slider');
             const ttsRateLabel = document.getElementById('tts-rate-label');
             
-            // Creator Tab
+            // Creator Tab (Selectors are global, so they still work)
             const connectBtn = document.getElementById('connect-btn');
             const statusLight = document.getElementById('status-light');
             const statusText = document.getElementById('status-text');
@@ -686,17 +768,12 @@
             const aiLikeBtn = document.getElementById('ai-like-btn');
             const aiDislikeBtn = document.getElementById('ai-dislike-btn');
             
-            // Creator: Local Save
+            // Settings Page
             const saveLocalBtn = document.getElementById('save-local-btn');
             const loadLocalBtn = document.getElementById('load-local-btn');
             
 
             // --- TOAST NOTIFICATION FUNCTION ---
-            /**
-             * Replaces alert() with a non-blocking toast notification.
-             * @param {string} message The text to display.
-             * @param {string} type 'success' or 'error' for styling.
-             */
             function showToast(message, type = 'success') {
                 if (toastTimer) clearTimeout(toastTimer); // Clear any existing timer
 
@@ -710,11 +787,47 @@
                     toast.classList.remove('show');
                 }, 3000);
             }
+            
+            // --- NEW NAVIGATION LOGIC ---
+            function showPage(pageId) {
+                // Hide all pages
+                pages.forEach(page => page.classList.remove('active'));
+                
+                // Show the target page
+                const targetPage = document.getElementById(`page-${pageId}`);
+                if (targetPage) {
+                    targetPage.classList.add('active');
+                }
+                
+                // Update active state for nav links
+                navLinks.forEach(link => {
+                    link.classList.toggle('active', link.dataset.page === pageId);
+                });
+                
+                // Special case: re-render library on library tab
+                if (pageId === 'library' || pageId === 'home') {
+                    renderReaderLibrary();
+                }
+                
+                // Close mobile menu on selection
+                if (window.innerWidth <= 768) {
+                    closeMobileMenu();
+                }
+            }
+            
+            function toggleMobileMenu() {
+                sidebar.classList.toggle('active');
+                overlay.classList.toggle('active');
+            }
+            
+            function closeMobileMenu() {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+            }
 
             // --- CORE DATA FUNCTIONS ---
             
             function loadUserStories() {
-                // This function is kept for any legacy stories users may have.
                 try {
                     const data = localStorage.getItem(DB_KEY);
                     userStories = data ? JSON.parse(data) : {};
@@ -723,8 +836,7 @@
             
             async function loadFeaturedStories() {
                 try {
-                    // Cache-bust
-                    const response = await fetch('stories/index.json?t=' + Date.now()); 
+                    const response = await fetch('stories/index.json?t=' + Date.now()); // Cache-bust
                     if (!response.ok) throw new Error('Failed to load stories/index.json. Create this file in your repo.');
                     const index = await response.json();
                     
@@ -735,22 +847,6 @@
                 } catch (e) {
                     console.error("No featured stories found:", e.message);
                     featuredStories = {};
-                }
-            }
-
-            function switchTab(e) {
-                const targetTab = e.target.dataset.tab;
-                tabButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.tab === targetTab));
-                tabContents.forEach(content => content.classList.toggle('active', content.id === targetTab));
-                
-                if (targetTab === 'reader-tab') {
-                    renderReaderLibrary();
-                }
-
-                // Close mobile menu on tab click
-                if (navMenu.classList.contains('active')) {
-                    navMenu.classList.remove('active');
-                    menuToggle.textContent = '☰';
                 }
             }
             
@@ -806,7 +902,7 @@
             // --- READER TAB & VIEW ---
             
             function renderReaderLibrary() {
-                // Render Featured Stories
+                // Render Featured Stories (on Home)
                 featuredStoryGrid.innerHTML = '';
                 const featuredStoryIds = Object.keys(featuredStories);
                 if (featuredStoryIds.length === 0) {
@@ -819,8 +915,28 @@
                     });
                 }
                 
-                // User Stories (Legacy) - This section is removed from HTML
-                // but the logic is kept in case you want to add it back.
+                // Render All Stories (on Library page)
+                // For now, it just shows featured. In future, you could merge local stories
+                userStoryGrid.innerHTML = '';
+                if (featuredStoryIds.length === 0) {
+                    userStoryGrid.innerHTML = `<p style="color: var(--text-secondary);">No stories found.</p>`;
+                } else {
+                    featuredStoryIds.forEach(storyId => {
+                        const story = featuredStories[storyId];
+                        const card = createStoryCard(storyId, story, true);
+                        userStoryGrid.appendChild(card.cloneNode(true)); // Clone to avoid moving
+                    });
+                    
+                    // Add event listeners to cloned cards
+                    userStoryGrid.querySelectorAll('.story-card').forEach(card => {
+                        // Find original storyId from the title
+                        const title = card.querySelector('.story-card-title').textContent;
+                        const storyId = Object.keys(featuredStories).find(id => featuredStories[id].title === title);
+                        if(storyId) {
+                            card.addEventListener('click', () => openReader(storyId, 'root', true));
+                        }
+                    });
+                }
             }
             
             function createStoryCard(storyId, story, isFeatured) {
@@ -916,7 +1032,6 @@
                     }
                 });
                 
-                // Clean the AI preamble from the content before rendering
                 const cleanContent = cleanAIResponse(node.content || "This chapter is empty.");
                 
                 const paragraphs = cleanContent.split('\n');
@@ -928,7 +1043,6 @@
                     if (p_text.trim() === '') {
                         p.innerHTML = '&nbsp;';
                     } else {
-                        // Split into sentences for TTS highlighting
                         const sentences = p_text.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [p_text];
                         sentences.forEach(s_text => {
                             const span = document.createElement('span');
@@ -955,23 +1069,15 @@
                 }
             }
             
-            /**
-             * Removes the AI preamble from the story text.
-             */
             function cleanAIResponse(text) {
                 let cleanText = text.trim();
-                
-                // This regex finds a preamble, even if it's a few lines down
-                // It looks for "Here is..." or "Thank you..." at the start of a line
                 const regex = /^(?:.*\n)*?(here is chapter \d+:|here is the continuation:|thank you for providing me with the context and instructions.)/i;
                 const match = cleanText.match(regex);
                 
                 if (match) {
-                    // Return only the text *after* the match
                     cleanText = cleanText.substring(match[0].length).trim();
                 }
 
-                // If the first line is just "Chapter X", remove it too.
                 cleanText = cleanText.replace(/^chapter \d+\n/i, '');
                 
                 return cleanText;
@@ -1055,12 +1161,7 @@
                 document.querySelectorAll('.tts-highlight').forEach(el => el.classList.remove('tts-highlight'));
             }
 
-            // --- CREATOR TAB FUNCTIONS (NEW, SIMPLIFIED) ---
-
-            /**
-             * Handles all calls to the AI backend.
-             * @param {string} mode - 'generate' or 'regenerate'
-             */
+            // --- CREATOR TAB FUNCTIONS ---
             async function callAI(mode) {
                 if (!isBackendConnected) { 
                     showToast("Error: Backend is not connected.", "error"); 
@@ -1084,7 +1185,6 @@
                         return;
                     }
                     
-                    // This is the new prompt format that fixes the bug
                     finalAiPrompt = `Here is the story so far:
 ${context}
 
@@ -1100,7 +1200,7 @@ Generate the next part of the story:`;
                 const originalBtnText = btnToDisable.textContent;
                 btnToDisable.disabled = true;
                 aiGenerateBtn.disabled = true;
-                aiRegenerTebtn.disabled = true;
+                aiRegenerateBtn.disabled = true;
                 btnToDisable.textContent = 'Generating...';
                 aiOutputCanvas.value = "Generating response...";
 
@@ -1111,7 +1211,7 @@ Generate the next part of the story:`;
                         body: JSON.stringify({
                             prompt: finalAiPrompt,
                             model_choice: model,
-                            feedback: "", // Not used by new backend, but sent
+                            feedback: "",
                             story_memory: "" 
                         })
                     });
@@ -1119,7 +1219,6 @@ Generate the next part of the story:`;
                     const data = await response.json();
                     if (!response.ok) throw new Error(data.error || "Unknown server error");
                     
-                    // Clean the response *before* displaying it
                     const cleanResponse = cleanAIResponse(data.story_text);
                     aiOutputCanvas.value = cleanResponse;
                     
@@ -1141,7 +1240,6 @@ Generate the next part of the story:`;
                 }
                 aiOutputCanvas.select();
                 try {
-                    // Using execCommand as clipboard.writeText might fail in iframe
                     document.execCommand('copy'); 
                     showToast("AI response copied to clipboard.", "success");
                 } catch (err) {
@@ -1149,11 +1247,13 @@ Generate the next part of the story:`;
                 }
             }
             
+            // --- SETTINGS PAGE FUNCTIONS ---
             function loadLocalContext() {
                 const text = localStorage.getItem(LOCAL_CONTEXT_KEY);
                 if(text) {
                     aiContextInput.value = text;
                     showToast("Local context loaded.", "success");
+                    showPage('creator'); // Switch to creator to show the loaded text
                 } else {
                     showToast("No local context found.", "error");
                 }
@@ -1161,26 +1261,25 @@ Generate the next part of the story:`;
             
             function saveLocalContext() {
                 const text = aiContextInput.value;
+                if (!text) {
+                    showToast("Nothing to save. Write in the Creator first.", "error");
+                    return;
+                }
                 localStorage.setItem(LOCAL_CONTEXT_KEY, text);
                 showToast("Story context saved to this browser.", "success");
             }
 
-            // --- MOBILE NAV TOGGLE ---
-            function toggleMenu() {
-                navMenu.classList.toggle('active');
-                if (navMenu.classList.contains('active')) {
-                    menuToggle.textContent = '✕'; // Close icon
-                } else {
-                    menuToggle.textContent = '☰'; // Hamburger icon
-                }
-            }
 
             // --- INITIALIZE ---
             
             async function init() {
                 // Attach main event listeners
-                menuToggle.addEventListener('click', toggleMenu); // NEW
-                tabButtons.forEach(btn => btn.addEventListener('click', switchTab));
+                menuToggle.addEventListener('click', toggleMobileMenu);
+                overlay.addEventListener('click', closeMobileMenu);
+                navLinks.forEach(link => {
+                    link.addEventListener('click', () => showPage(link.dataset.page));
+                });
+                
                 connectBtn.addEventListener('click', checkBackendStatus);
                 
                 // Reader
@@ -1200,25 +1299,26 @@ Generate the next part of the story:`;
                         aiContextInput.value += `\n\n${output}`;
                         aiOutputCanvas.value = "";
                         aiPromptInput.value = "";
-                        saveLocalContext(); // Auto-save on add
+                        // Auto-save on add
+                        localStorage.setItem(LOCAL_CONTEXT_KEY, aiContextInput.value); 
+                        showToast("Added to context and auto-saved.", "success");
                     } else {
                         showToast("No valid text to add.", "error");
                     }
                 });
                 
+                // Settings
                 saveLocalBtn.addEventListener('click', saveLocalContext);
                 loadLocalBtn.addEventListener('click', loadLocalContext);
                 
-                // Load legacy stories
+                // Load data
                 loadUserStories(); 
-                // Load featured stories from stories/ folder
                 await loadFeaturedStories(); 
                 
                 // Render initial views
-                renderReaderLibrary();
+                showPage('home'); // Show home page on load
                 
                 // Load dev context from last session
-                // Do not show toast on initial load
                 const text = localStorage.getItem(LOCAL_CONTEXT_KEY);
                 if(text) {
                     aiContextInput.value = text;
