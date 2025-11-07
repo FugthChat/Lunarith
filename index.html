@@ -27,9 +27,8 @@
             margin: 0;
             padding: 0;
         }
-        html, body {
+        html {
             height: 100%;
-            overflow: hidden; /* Prevent body scroll */
         }
         body {
             font-family: var(--font-family);
@@ -39,6 +38,8 @@
             flex-direction: column;
             line-height: 1.6;
             font-size: 16px;
+            height: 100%;
+            overflow: hidden; /* Prevent body from scrolling */
         }
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: var(--bg-tertiary); }
@@ -89,8 +90,7 @@
         main {
             flex-grow: 1;
             display: flex;
-            overflow: hidden; /* Key for scrolling tabs */
-            height: 100%; 
+            overflow: hidden; /* This is key */
         }
         .tab-content {
             display: none;
@@ -202,6 +202,7 @@
         p {
             color: var(--text-secondary);
             margin-bottom: 1rem;
+            line-height: 1.7;
         }
 
         /* --- LIBRARY/READER TAB --- */
@@ -423,25 +424,29 @@
             <p>Your personal AI story generation studio.</p>
             
             <div class="panel-section">
-                <h3>Quick Start</h3>
-                <p>
-                    1.  Go to the <strong>Creator</strong> tab to start writing.
-                </p>
-                <p>
-                    2.  Go to the <strong>Library</strong> tab to read your "Featured Stories" (from your GitHub `stories/` folder).
-                </p>
-                <p>
-                    3.  Go to the <strong>Settings</strong> tab to save your local work to a file (which you can then upload to GitHub).
-                </p>
-            </div>
-            
-            <div class="panel-section">
                 <h3>Backend Status</h3>
                 <div style="display: flex; align-items: center; margin-bottom: 1rem;">
                     <span id="status-light-home" class="status-light"></span>
                     <span id="status-text-home">Offline</span>
                 </div>
                 <button id="connect-btn-home" class="btn-primary">Connect to Backend</button>
+                <p style="font-size: 0.9rem; margin-top: 1rem;">
+                    Note: Your backend on the Hugging Face free tier goes to sleep.
+                    Click this button to "wake it up". It may take 1-2 minutes.
+                </p>
+            </div>
+            
+            <div class="panel-section">
+                <h3>Quick Start</h3>
+                <p>
+                    1.  Go to the <strong>Creator</strong> tab to start writing. Your work is saved to your browser automatically.
+                </p>
+                <p>
+                    2.  Go to the <strong>Library</strong> tab to read "Featured Stories" (from your GitHub `stories/` folder) and your own "Local Creations."
+                </p>
+                <p>
+                    3.  Go to the <strong>Settings</strong> tab to export your creations. To publish, you must manually add the exported `.json` file to your GitHub `stories/` folder.
+                </p>
             </div>
         </div>
 
@@ -475,6 +480,12 @@
                             <button id="ai-regenerate-btn" class="btn-secondary">Regenerate</button>
                         </div>
                     </fieldset>
+                    
+                    <!-- Job Status -->
+                    <div id="job-status-panel" class="panel-section" style="display: none;">
+                        <h3>Generation Status</h3>
+                        <p id="job-status-text">Processing...</p>
+                    </div>
 
                 </aside>
 
@@ -508,7 +519,7 @@
                 <!-- JS will fill this -->
             </div>
             
-            <h2 style="margin-top: 2rem;">Local Creations</h2>
+            <h2 style="margin-top: 2rem;">Your Local Creations</h2>
             <div class="story-library-grid" id="user-story-grid">
                 <!-- JS will fill this -->
             </div>
@@ -518,7 +529,7 @@
         <!-- ===== SETTINGS TAB ==== -->
         <!-- ======================= -->
         <div id="settings-tab" class="tab-content">
-            <h1>Settings</h1>
+            <h1>Settings & Data</h1>
 
             <div class="panel-section">
                 <h3>Save Story Context</h3>
@@ -537,14 +548,15 @@
             </div>
             
             <div class="panel-section">
-                <h3>Export for Publishing</h3>
+                <h3>Branching Story Editor (Legacy)</h3>
                 <p>
-                    To "publish" a story, first save it locally. Then, copy its text. You will need to manually create a new `.json` file in your GitHub `stories/` folder and add it to `stories/index.json`. This system is read-only.
+                    This is the old system for creating branching stories. New stories should be created by saving your "Story Context" and uploading it as a new JSON file to your GitHub `stories/` folder.
                 </p>
-                <!-- These buttons are for the old, complex system. We can remove them.
-                <button id="import-btn" class="btn-secondary">Import Creations (.json)</button>
-                <button id="export-btn" class="btn-secondary">Export Creations (.json)</button>
-                -->
+                <div class="button-group" style="flex-direction: column; gap: 0.75rem;">
+                    <button id="new-story-btn" class="btn-secondary">Create New Branching Story (Legacy)</button>
+                    <button id="import-btn" class="btn-secondary">Import Branching Story (.json)</button>
+                    <button id="export-btn" class="btn-secondary">Export Branching Stories (.json)</button>
+                </div>
             </div>
         </div>
     </main>
@@ -602,8 +614,9 @@
 
             // --- STATE & CONSTANTS ---
             const API_URL = "https://fugthchat-fugthdes.hf.space";
-            const DB_KEY = "lunarith_user_stories_v4"; // Key for legacy user creations
+            const DB_KEY = "lunarith_user_stories_v4"; // Key for legacy branching stories
             const LOCAL_CONTEXT_KEY = "lunarith_dev_context"; // Key for the simple text canvas
+            const PENDING_JOB_KEY = "lunarith_pending_job"; // NEW: Key for the background job
             
             let featuredStories = {}; // Stories from /stories/index.json
             let userStories = {};     // Stories from localStorage
@@ -612,6 +625,7 @@
             
             let isBackendConnected = false;
             let lastAiGenPrompt = ""; // For "Regenerate"
+            let currentPollInterval = null; // Holds the interval timer for job polling
             
             let ttsUtterance;
             let ttsSentences = [];
@@ -644,14 +658,16 @@
             const ttsRateSlider = document.getElementById('tts-rate-slider');
             const ttsRateLabel = document.getElementById('tts-rate-label');
             
-            // Connect Buttons
-            const connectBtnHome = document.getElementById('connect-btn-home');
-            const statusLightHome = document.getElementById('status-light-home');
-            const statusTextHome = document.getElementById('status-text-home');
-
+            // Connect Buttons (now on multiple tabs)
+            const connectBtns = [document.getElementById('connect-btn-home'), document.querySelector('#creator-tab .btn-primary')];
+            const statusLights = [document.getElementById('status-light-home'), document.querySelector('#creator-tab .status-light')];
+            const statusTexts = [document.getElementById('status-text-home'), document.querySelector('#creator-tab .status-text')];
+            
             // Creator Tab
             const aiControls = document.getElementById('ai-controls');
             const modelSelect = document.getElementById('model-select');
+            const jobStatusPanel = document.getElementById('job-status-panel');
+            const jobStatusText = document.getElementById('job-status-text');
             
             // Creator: Input
             const aiContextInput = document.getElementById('ai-context-input');
@@ -669,16 +685,24 @@
             // Settings Tab
             const saveLocalBtn = document.getElementById('save-local-btn');
             const loadLocalBtn = document.getElementById('load-local-btn');
+            const newStoryBtn = document.getElementById('new-story-btn');
+            const importBtn = document.getElementById('import-btn');
+            const exportBtn = document.getElementById('export-btn');
             
 
             // --- CORE DATA FUNCTIONS ---
             
             function loadUserStories() {
-                // This function is kept for any legacy stories users may have.
                 try {
                     const data = localStorage.getItem(DB_KEY);
                     userStories = data ? JSON.parse(data) : {};
                 } catch (e) { console.error("Error loading user stories:", e); userStories = {}; }
+            }
+            
+            function saveUserStories() {
+                try {
+                    localStorage.setItem(DB_KEY, JSON.stringify(userStories));
+                } catch (e) { console.error("Error saving user stories:", e); alert("Error: Could not save data."); }
             }
             
             async function loadFeaturedStories() {
@@ -696,6 +720,10 @@
                     featuredStories = {};
                 }
             }
+            
+            function generateId(prefix = 'node') {
+                return `${prefix}_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+            }
 
             function switchTab(e) {
                 const targetTab = e.target.dataset.tab;
@@ -710,10 +738,9 @@
             // --- BACKEND CONNECTION ---
             
             async function checkBackendStatus() {
-                // Update both status indicators
-                [statusLightHome, document.querySelector('#creator-tab .status-light')].forEach(el => el.className = 'status-light connecting');
-                [statusTextHome, document.querySelector('#creator-tab .status-text')].forEach(el => el.textContent = 'Connecting...');
-                [connectBtnHome, document.querySelector('#creator-tab #connect-btn')].forEach(el => el.disabled = true);
+                statusLights.forEach(el => el.className = 'status-light connecting');
+                statusTexts.forEach(el => el.textContent = 'Connecting...');
+                connectBtns.forEach(el => el.disabled = true);
                 
                 aiControls.disabled = true;
                 modelSelect.innerHTML = '<option value="">-- Connecting... --</option>';
@@ -727,8 +754,8 @@
                         throw new Error("Backend reported it is not ready.");
                     }
                     
-                    [statusLightHome, document.querySelector('#creator-tab .status-light')].forEach(el => el.className = 'status-light connected');
-                    [statusTextHome, document.querySelector('#creator-tab .status-text')].forEach(el => el.textContent = `Connected (${data.model_loaded})`);
+                    statusLights.forEach(el => el.className = 'status-light connected');
+                    statusTexts.forEach(el => el.textContent = `Connected (${data.model_loaded})`);
 
                     isBackendConnected = true;
                     aiControls.disabled = false; 
@@ -748,14 +775,14 @@
                     
                 } catch (err) {
                     console.error("Backend connection failed:", err);
-                    [statusLightHome, document.querySelector('#creator-tab .status-light')].forEach(el => el.className = 'status-light error');
-                    [statusTextHome, document.querySelector('#creator-tab .status-text')].forEach(el => el.textContent = 'Connection Failed');
+                    statusLights.forEach(el => el.className = 'status-light error');
+                    statusTexts.forEach(el => el.textContent = 'Connection Failed');
                     isBackendConnected = false;
                     aiControls.disabled = true;
                     modelSelect.disabled = true;
                     modelSelect.innerHTML = '<option value="">-- Offline --</option>';
                 } finally {
-                    [connectBtnHome, document.querySelector('#creator-tab #connect-btn')].forEach(el => el.disabled = false);
+                    connectBtns.forEach(el => el.disabled = false);
                 }
             }
 
@@ -779,7 +806,7 @@
                 userStoryGrid.innerHTML = '';
                 const userStoryIds = Object.keys(userStories);
                 if (userStoryIds.length === 0) {
-                    userStoryGrid.innerHTML = `<p style="color: var(--text-secondary);">Legacy stories from old versions will appear here.</p>`;
+                    userStoryGrid.innerHTML = `<p style="color: var(--text-secondary);">Your legacy branching stories will appear here.</p>`;
                 } else {
                     userStoryIds.forEach(storyId => {
                         const story = userStories[storyId];
@@ -1023,21 +1050,15 @@
                 document.querySelectorAll('.tts-highlight').forEach(el => el.classList.remove('tts-highlight'));
             }
 
-            // --- CREATOR TAB FUNCTIONS (NEW, SIMPLIFIED) ---
+            // --- CREATOR TAB FUNCTIONS (NEW, ASYNC) ---
 
-            /**
-             * Handles all calls to the AI backend.
-             * @param {string} mode - 'generate' or 'regenerate'
-             */
-            async function callAI(mode) {
+            async function handleGenerateClick(mode) {
                 if (!isBackendConnected) { 
                     alert("Error: Backend is not connected."); 
                     return; 
                 }
                 
-                let btnToDisable = (mode === 'regenerate') ? aiRegenerateBtn : aiGenerateBtn;
                 let finalAiPrompt;
-
                 if (mode === 'regenerate') {
                     if (!lastAiGenPrompt) {
                         alert("No previous prompt to regenerate.");
@@ -1053,63 +1074,113 @@
                     }
                     
                     // This is the new prompt format that fixes the bug
-                    finalAiPrompt = `Here is the story so far:
+                    finalAiPrompt = `<|user|>
+Here is the story so far:
 ${context}
 
 Here is my instruction:
 ${prompt}
-
-Generate the next part of the story:`;
+<|endoftext|>
+<|assistant|>`;
                     
                     lastAiGenPrompt = finalAiPrompt; // Save for regeneration
                 }
 
                 const model = modelSelect.value;
-                const originalBtnText = btnToDisable.textContent;
-                btnToDisable.disabled = true;
+                
                 aiGenerateBtn.disabled = true;
                 aiRegenerateBtn.disabled = true;
-                btnToDisable.textContent = 'Generating...';
-                aiOutputCanvas.value = "Generating response...";
+                aiGenerateBtn.textContent = 'Submitting...';
+                aiOutputCanvas.value = "Submitting job to backend...";
+                jobStatusPanel.style.display = 'block';
+                jobStatusText.textContent = 'Submitting job...';
 
                 try {
-                    const response = await fetch(API_URL + "/generate", {
+                    // --- NEW: Submit the job ---
+                    const response = await fetch(API_URL + "/submit_job", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({
                             prompt: finalAiPrompt,
-                            model_choice: model,
-                            feedback: "", // Not used by new backend, but sent
-                            story_memory: "" 
+                            model_choice: model
                         })
                     });
                     
                     const data = await response.json();
-                    if (!response.ok) throw new Error(data.error || "Unknown server error");
+                    if (!response.ok) throw new Error(data.error || "Failed to submit job");
                     
-                    // Clean the response *before* displaying it
-                    const cleanResponse = cleanAIResponse(data.story_text);
-                    aiOutputCanvas.value = cleanResponse;
+                    const job_id = data.job_id;
+                    localStorage.setItem(PENDING_JOB_KEY, job_id); // Save job ID
+                    
+                    aiGenerateBtn.textContent = 'Generating...';
+                    jobStatusText.textContent = `Job submitted! (ID: ...${job_id.slice(-6)}). You can close this window.`;
+                    aiOutputCanvas.value = "Waiting for response... Polling every 5 seconds.";
+                    
+                    // Start polling
+                    pollJobStatus(job_id);
                     
                 } catch (err) {
                     console.error("AI Generation Error:", err);
                     aiOutputCanvas.value = `Error: ${err.message}`;
-                } finally {
-                    btnToDisable.disabled = false;
                     aiGenerateBtn.disabled = false;
                     aiRegenerateBtn.disabled = false;
-                    btnToDisable.textContent = originalBtnText;
+                    aiGenerateBtn.textContent = 'Generate';
+                    jobStatusPanel.style.display = 'none';
                 }
             }
+            
+            function pollJobStatus(job_id) {
+                if (currentPollInterval) clearInterval(currentPollInterval); // Clear any old timers
+                
+                jobStatusPanel.style.display = 'block';
+                jobStatusText.textContent = `Checking job: ...${job_id.slice(-6)}`;
+                
+                currentPollInterval = setInterval(async () => {
+                    try {
+                        const response = await fetch(`${API_URL}/get_job_status/${job_id}`);
+                        const data = await response.json();
+
+                        if (data.status === 'complete') {
+                            clearInterval(currentPollInterval);
+                            currentPollInterval = null;
+                            const cleanResponse = cleanAIResponse(data.result);
+                            aiOutputCanvas.value = cleanResponse;
+                            jobStatusPanel.style.display = 'none';
+                            localStorage.removeItem(PENDING_JOB_KEY);
+                            aiGenerateBtn.disabled = false;
+                            aiRegenerateBtn.disabled = false;
+                            aiGenerateBtn.textContent = 'Generate';
+                            
+                        } else if (data.status === 'error') {
+                            clearInterval(currentPollInterval);
+                            currentPollInterval = null;
+                            aiOutputCanvas.value = `Error from backend: ${data.result}`;
+                            jobStatusPanel.style.display = 'none';
+                            localStorage.removeItem(PENDING_JOB_KEY);
+                            aiGenerateBtn.disabled = false;
+                            aiRegenerateBtn.disabled = false;
+                            aiGenerateBtn.textContent = 'Generate';
+
+                        } else if (data.status === 'processing') {
+                            jobStatusText.textContent = "Job is processing... (you can wait or close)";
+                        
+                        } else { // pending
+                            jobStatusText.textContent = "Job is pending in queue...";
+                        }
+                    } catch (err) {
+                        console.error("Poll error:", err);
+                        jobStatusText.textContent = "Polling failed... retrying.";
+                    }
+                }, 5000); // Poll every 5 seconds
+            }
+
             
             function copyOutputToClipboard() {
                 aiOutputCanvas.select();
                 try {
-                    // Use modern clipboard API if available (more robust)
                     navigator.clipboard.writeText(aiOutputCanvas.value)
                         .then(() => alert("AI response copied to clipboard."))
                         .catch(() => {
-                            // Fallback for older browsers
                             document.execCommand('copy');
                             alert("AI response copied to clipboard.");
                         });
@@ -1133,6 +1204,72 @@ Generate the next part of the story:`;
                 localStorage.setItem(LOCAL_CONTEXT_KEY, text);
                 alert("Story context saved to this browser.");
             }
+            
+            // --- LEGACY (Branching Story) FUNCTIONS ---
+            // These are now hidden in the "Settings" tab
+            
+            function createNewStory() {
+                const title = prompt("Enter new story title:", "My New Story");
+                if (!title) return;
+                const author = "Me";
+                
+                const storyId = generateId('story');
+                userStories[storyId] = {
+                    title,
+                    author,
+                    cover: `https://placehold.co/300x450/${Math.floor(Math.random()*16777215).toString(16)}/FFFFFF?text=${encodeURIComponent(title)}`,
+                    nodes: {
+                        "root": { title: "Chapter 1", content: "...", choices: [] }
+                    }
+                };
+                saveUserStories();
+                alert("New branching story created in 'Library' tab.");
+            }
+            
+            function exportData() {
+                if (Object.keys(userStories).length === 0) {
+                    alert("No creations to export."); return;
+                }
+                if (!confirm("This will export your *legacy branching stories* as a single JSON file. This is for backup.")) return;
+                try {
+                    const data = JSON.stringify(userStories, null, 2);
+                    const blob = new Blob([data], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'lunarith_creations_backup.json';
+                    a.click();
+                    URL.revokeObjectURL(url);
+                } catch (err) { alert("Error exporting data: " + err.message); }
+            }
+            
+            function importData() {
+                if (!confirm("WARNING: This will *replace* all your legacy branching stories with the data from the file. This cannot be undone.")) return;
+                
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = '.json,application/json';
+                input.onchange = (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        try {
+                            const data = JSON.parse(event.target.result);
+                            if (typeof data !== 'object' || Array.isArray(data)) {
+                                throw new Error("Invalid file format.");
+                            }
+                            userStories = data;
+                            saveUserStories();
+                            renderReaderLibrary();
+                            alert("Import successful!");
+                        } catch (err) { alert("Error importing file: " + err.message); }
+                    };
+                    reader.readAsText(file);
+                };
+                input.click();
+            }
 
 
             // --- INITIALIZE ---
@@ -1140,16 +1277,15 @@ Generate the next part of the story:`;
             async function init() {
                 // Attach main event listeners
                 tabButtons.forEach(btn => btn.addEventListener('click', switchTab));
-                connectBtnHome.addEventListener('click', checkBackendStatus);
-                document.querySelector('#creator-tab #connect-btn').addEventListener('click', checkBackendStatus);
+                connectBtns.forEach(btn => btn.addEventListener('click', checkBackendStatus));
                 
                 // Reader
                 readerCloseBtn.addEventListener('click', closeReader);
                 initTTS();
                 
                 // Creator
-                aiGenerateBtn.addEventListener('click', () => callAI('generate'));
-                aiRegenerateBtn.addEventListener('click', () => callAI('regenerate'));
+                aiGenerateBtn.addEventListener('click', () => handleGenerateClick('generate'));
+                aiRegenerateBtn.addEventListener('click', () => handleGenerateClick('regenerate'));
                 aiLikeBtn.addEventListener('click', () => console.log("AI Feedback: LIKE"));
                 aiDislikeBtn.addEventListener('click', () => console.log("AI Feedback: DISLIKE"));
                 copyTextBtn.addEventListener('click', copyOutputToClipboard);
@@ -1169,6 +1305,9 @@ Generate the next part of the story:`;
                 // Settings
                 saveLocalBtn.addEventListener('click', saveLocalContext);
                 loadLocalBtn.addEventListener('click', loadLocalContext);
+                newStoryBtn.addEventListener('click', createNewStory);
+                importBtn.addEventListener('click', importData);
+                exportBtn.addEventListener('click', exportData);
                 
                 // Load data
                 loadUserStories(); // For legacy stories
@@ -1182,6 +1321,13 @@ Generate the next part of the story:`;
                 
                 // Auto-connect
                 checkBackendStatus();
+
+                // *** NEW: Check for a pending job on load ***
+                const pendingJobId = localStorage.getItem(PENDING_JOB_KEY);
+                if (pendingJobId) {
+                    alert("Found a pending job... checking its status.");
+                    pollJobStatus(pendingJobId);
+                }
             }
 
             init();
